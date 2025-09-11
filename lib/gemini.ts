@@ -7,7 +7,7 @@ export interface Person {
     photo: string; // base64 encoded image
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const fileToGenerativePart = (base64: string, mimeType: string) => {
     return {
@@ -24,7 +24,7 @@ export const identifyPerson = async (
 ): Promise<string> => {
     const model = 'gemini-2.5-flash';
 
-    if (!process.env.API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
         return "API 키가 설정되지 않았습니다.";
     }
 
@@ -68,7 +68,7 @@ export const identifyPerson = async (
 export const detectFace = async (targetImageBase64: string): Promise<boolean> => {
     const model = 'gemini-2.5-flash';
 
-    if (!process.env.API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
         console.error("API 키가 설정되지 않았습니다.");
         return false;
     }
