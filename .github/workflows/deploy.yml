@@ -9,8 +9,6 @@ on:
 # GitHub Pages에 배포하기 위한 퍼미션 설정
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 # 동시 배포 방지
 concurrency:
@@ -39,18 +37,11 @@ jobs:
       env:
         NODE_ENV: production
       
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      with:
-        enablement: true
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './dist'
-        
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        cname: # 도메인이 있다면 여기에 입력
         
