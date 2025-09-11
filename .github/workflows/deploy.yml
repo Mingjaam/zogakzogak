@@ -47,4 +47,6 @@ jobs:
         destination_dir: zogakzogak
         keep_files: true
         force_orphan: false
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
         
