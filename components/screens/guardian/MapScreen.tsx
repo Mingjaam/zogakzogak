@@ -46,7 +46,7 @@ const MapScreen: React.FC = () => {
     };
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full overflow-y-auto">
             {/* Current Location Card */}
             <div className="bg-white p-4 mx-4 mt-4 rounded-3xl shadow-md">
                 <div className="flex justify-between items-center">
@@ -69,7 +69,7 @@ const MapScreen: React.FC = () => {
             </div>
 
             {/* Map View */}
-            <div className="flex-1 relative bg-gray-200 mx-4 my-4 rounded-3xl shadow-md overflow-hidden">
+            <div className="relative bg-gray-200 mx-4 my-4 rounded-3xl shadow-md overflow-hidden" style={{ height: '400px' }}>
                 <GoogleMap 
                     center={{ lat: 35.8714, lng: 128.6014 }}
                     zoom={15}
