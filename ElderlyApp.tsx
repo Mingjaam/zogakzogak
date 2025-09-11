@@ -54,7 +54,11 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
 
     return (
         <div className="h-screen w-screen bg-[#f9f8f4] flex flex-col antialiased">
-            <AppHeader title={getHeaderTitle()} onTitleClick={onHeaderClick} />
+            <AppHeader 
+                title={getHeaderTitle()} 
+                onTitleClick={onHeaderClick}
+                onNotificationClick={() => setActiveTab('notifications')}
+            />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}
             </main>
