@@ -132,16 +132,19 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
 
   if (!isOpen) return null;
 
+  // 모바일 디버깅
+  console.log('SafeZoneModal rendering on mobile:', window.innerWidth < 768, 'isOpen:', isOpen);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-2 sm:p-4 touch-manipulation">
+      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col mx-2 sm:mx-0">
         {/* Header - 고정 */}
         <div className="p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800">안심구역 설정</h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 active:bg-gray-300 transition touch-manipulation"
             >
               <span className="text-gray-600">×</span>
             </button>
@@ -152,7 +155,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
             {/* 지도 */}
-            <div className="h-80 rounded-2xl overflow-hidden border border-gray-200">
+            <div className="h-64 sm:h-80 rounded-2xl overflow-hidden border border-gray-200">
               <GoogleMap
                 center={center}
                 zoom={15}
@@ -278,13 +281,13 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         <div className="p-6 border-t border-gray-200 flex justify-end gap-3 flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-6 py-2 text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+            className="px-6 py-3 text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 active:bg-gray-300 transition touch-manipulation min-h-[44px]"
           >
             취소
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 text-white bg-[#70c18c] rounded-full hover:bg-[#5aa373] transition"
+            className="px-6 py-3 text-white bg-[#70c18c] rounded-full hover:bg-[#5aa373] active:bg-[#4a8a5f] transition touch-manipulation min-h-[44px]"
           >
             저장
           </button>
