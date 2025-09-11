@@ -1,13 +1,16 @@
 
 import React from 'react';
-import PuzzleLogo from './icons/PuzzleLogo';
 
 const SplashScreen: React.FC = () => {
     return (
         <main className="bg-[#70c18c] h-screen w-screen flex flex-col items-center justify-center text-center text-white antialiased">
             <div className="flex flex-col items-center justify-center gap-5 animate-fadeIn">
                 <div className="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl shadow-black/20">
-                    <PuzzleLogo className="w-24 h-24" />
+                    <img 
+                        src="/zogakzogak/icon-192x192.png" 
+                        alt="조각조각 로고" 
+                        className="w-24 h-24"
+                    />
                 </div>
                 <div className="flex flex-col gap-2">
                     <h1 className="text-5xl font-extrabold tracking-wider">조각조각</h1>
