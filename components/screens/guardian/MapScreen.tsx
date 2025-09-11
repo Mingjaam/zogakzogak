@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import GoogleMap from '../../GoogleMap';
+import { Memory, dummyMemories } from '../../../types/memory';
 import LocationPinIcon from '../../icons/LocationPinIcon';
 import RocketIcon from '../../icons/RocketIcon';
 import ClockIcon from '../../icons/ClockIcon';
@@ -6,14 +8,39 @@ import CheckCircleIcon from '../../icons/CheckCircleIcon';
 import WarningIcon from '../../icons/WarningIcon';
 import PaperPlaneIcon from '../../icons/PaperPlaneIcon';
 
+// Google Maps 타입 정의
+declare global {
+  interface Window {
+    google: any;
+    googleMapsApiLoaded: boolean;
+  }
+  namespace google {
+    namespace maps {
+      class Map {
+        constructor(element: HTMLElement, options?: any);
+        panTo(latLng: { lat: number; lng: number }): void;
+        setZoom(zoom: number): void;
+      }
+    }
+  }
+}
+
 const MapScreen: React.FC = () => {
-    // Placeholder image for the map
-    const mapImageUrl = 'https://i.imgur.com/3Z2G9g7.png';
+    const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+    const mapRef = useRef<google.maps.Map | null>(null);
+
+    const handleMemoryClick = (memory: Memory) => {
+        setSelectedMemory(memory);
+    };
+
+    const handleMapLoad = (map: google.maps.Map) => {
+        mapRef.current = map;
+    };
 
     return (
-        <div className="p-4 space-y-6">
+        <div className="h-full flex flex-col">
             {/* Current Location Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-md">
+            <div className="bg-white p-4 mx-4 mt-4 rounded-3xl shadow-md">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <LocationPinIcon className="w-6 h-6 text-gray-500" />
@@ -34,15 +61,23 @@ const MapScreen: React.FC = () => {
             </div>
 
             {/* Map View */}
-            <div className="relative h-64 rounded-3xl shadow-md overflow-hidden">
-                <img src={mapImageUrl} alt="Map of safe zone" className="w-full h-full object-cover" />
-                 <button className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg">
+            <div className="flex-1 relative bg-gray-200 mx-4 my-4 rounded-3xl shadow-md overflow-hidden">
+                <GoogleMap 
+                    center={{ lat: 35.8714, lng: 128.6014 }}
+                    zoom={15}
+                    className="w-full h-full"
+                    memories={dummyMemories}
+                    onMemoryClick={handleMemoryClick}
+                    selectedMemoryId={selectedMemory?.id}
+                    onMapLoad={handleMapLoad}
+                />
+                <button className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-lg z-10">
                     <PaperPlaneIcon className="w-6 h-6 text-gray-600 -rotate-45" />
                 </button>
             </div>
 
             {/* Recent Routes Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-md">
+            <div className="bg-white p-4 mx-4 mb-4 rounded-3xl shadow-md">
                 <h2 className="text-lg font-bold text-gray-800 mb-4">최근 경로</h2>
                 <div className="space-y-3">
                     <div className="bg-lime-50 border border-lime-200 p-3 rounded-xl flex items-start gap-3">
@@ -63,7 +98,7 @@ const MapScreen: React.FC = () => {
             </div>
 
             {/* Safe Zone Settings Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-md">
+            <div className="bg-white p-4 mx-4 mb-4 rounded-3xl shadow-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold text-gray-800">안심 구역 설정</h2>
                     <button className="px-4 py-1.5 text-sm font-semibold border-2 border-gray-300 rounded-full hover:bg-gray-100 transition">편집</button>

@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>조각조각</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 구글맵 API 스크립트 로딩 -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQm6U7drl1pAuDJFmXxr8HGRG1OvBEKAw&callback=initMap"
+    defer
+  ></script>
+  <script>
+    function initMap() {
+      window.googleMapsApiLoaded = true;
+      const event = new Event('googleMapsApiLoaded');
+      window.dispatchEvent(event);
+    }
+    window.googleMapsApiLoaded = false;
+  </script>
   <style>
     /* Prevents pull-to-refresh and other overscroll behaviors on mobile */
     body {
