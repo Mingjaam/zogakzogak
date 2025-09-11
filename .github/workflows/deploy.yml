@@ -45,6 +45,4 @@ jobs:
         publish_dir: ./dist
         external_repository: Mingjaam/mingjaam.github.io
         destination_dir: zogakzogak
-        keep_files: false
-        force_orphan: true
         
