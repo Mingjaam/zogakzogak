@@ -109,6 +109,12 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
   const handleSave = () => {
     updateSafeZone(center, radius);
     onSave(center, radius);
+    document.body.style.overflow = '';
+    onClose();
+  };
+
+  const handleClose = () => {
+    document.body.style.overflow = '';
     onClose();
   };
 
@@ -133,13 +139,22 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
   if (!isOpen) return null;
 
   // PWA 디버깅
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   console.log('SafeZoneModal rendering:', {
     isOpen,
     isMobile: window.innerWidth < 768,
-    isPWA: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone,
+    isPWA,
     viewportHeight: window.innerHeight,
-    userAgent: navigator.userAgent
+    viewportWidth: window.innerWidth,
+    userAgent: navigator.userAgent,
+    displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser'
   });
+  
+  // PWA에서 강제로 모달 표시
+  if (isPWA && isOpen) {
+    console.log('PWA 모드에서 모달 강제 표시');
+    document.body.style.overflow = 'hidden';
+  }
 
   return (
     <div 
@@ -151,22 +166,31 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         right: 0,
         bottom: 0,
         zIndex: 9999,
-        WebkitOverflowScrolling: 'touch'
+        WebkitOverflowScrolling: 'touch',
+        width: '100vw',
+        height: '100vh',
+        margin: 0,
+        padding: '4px'
       }}
     >
       <div 
         className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col mx-2 sm:mx-0 pwa-modal-content"
         style={{
-          maxHeight: '90vh',
-          overflow: 'hidden'
+          maxHeight: 'calc(100vh - 8px)',
+          width: 'calc(100vw - 8px)',
+          maxWidth: '480px',
+          minHeight: '400px',
+          overflow: 'hidden',
+          margin: 0,
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)'
         }}
       >
         {/* Header - 고정 */}
-        <div className="p-6 border-b border-gray-200 flex-shrink-0">
+        <div className="p-6 border-b border-gray-200 flex-shrink-0 pwa-modal-header">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800">안심구역 설정</h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 active:bg-gray-300 transition touch-manipulation"
             >
               <span className="text-gray-600">×</span>
@@ -175,7 +199,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         </div>
 
         {/* Content - 스크롤 가능 */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pwa-modal-body">
           <div className="p-6 space-y-6">
             {/* 지도 */}
             <div className="h-64 sm:h-80 rounded-2xl overflow-hidden border border-gray-200">
@@ -301,9 +325,9 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         </div>
 
         {/* Footer - 고정 */}
-        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 flex-shrink-0">
+        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 flex-shrink-0 pwa-modal-footer">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-6 py-3 text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 active:bg-gray-300 transition touch-manipulation min-h-[44px]"
           >
             취소
