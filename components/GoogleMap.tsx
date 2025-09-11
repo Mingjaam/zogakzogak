@@ -13,6 +13,7 @@ declare global {
         constructor(element: HTMLElement, options?: any);
         panTo(latLng: { lat: number; lng: number }): void;
         setZoom(zoom: number): void;
+        addListener(event: string, handler: (event: any) => void): void;
       }
       class Marker {
         constructor(options?: any);
@@ -123,7 +124,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
       // 지도 클릭 이벤트 추가
       if (onMapClick) {
-        mapInstanceRef.current.addListener('click', (event: any) => {
+        map.addListener('click', (event: any) => {
           const lat = event.latLng.lat();
           const lng = event.latLng.lng();
           onMapClick(lat, lng);
