@@ -10,22 +10,7 @@ import CheckCircleIcon from '../../icons/CheckCircleIcon';
 import WarningIcon from '../../icons/WarningIcon';
 import PaperPlaneIcon from '../../icons/PaperPlaneIcon';
 
-// Google Maps 타입 정의
-declare global {
-  interface Window {
-    google: any;
-    googleMapsApiLoaded: boolean;
-  }
-  namespace google {
-    namespace maps {
-      class Map {
-        constructor(element: HTMLElement, options?: any);
-        panTo(latLng: { lat: number; lng: number }): void;
-        setZoom(zoom: number): void;
-      }
-    }
-  }
-}
+// Google Maps 타입 정의는 GoogleMap 컴포넌트에서 이미 정의되어 있음
 
 const MapScreen: React.FC = () => {
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
