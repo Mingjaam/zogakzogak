@@ -101,6 +101,31 @@ npm run build
 npm run preview
 ```
 
+### 🚀 GitHub Pages 자동 배포
+
+이 프로젝트는 GitHub Actions를 통해 자동으로 GitHub Pages에 배포됩니다.
+
+#### 설정 방법
+
+1. **GitHub 저장소 설정**
+   - GitHub 저장소의 Settings > Pages로 이동
+   - Source를 "GitHub Actions"로 설정
+
+2. **자동 배포 활성화**
+   - `main` 또는 `master` 브랜치에 코드를 푸시하면 자동으로 배포됩니다
+   - 배포된 사이트는 `https://yourusername.github.io/zogakzogak/`에서 확인할 수 있습니다
+
+3. **배포 확인**
+   - Actions 탭에서 배포 상태를 확인할 수 있습니다
+   - 배포가 완료되면 GitHub Pages에서 사이트를 확인할 수 있습니다
+
+#### 배포 파일 구조
+```
+.github/
+└── workflows/
+    └── deploy.yml    # GitHub Actions 워크플로우
+```
+
 ## 🎨 주요 화면
 
 ### 노인용 화면

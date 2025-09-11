@@ -4,6 +4,7 @@ import AuthScreen from './components/AuthScreen';
 import RoleSelectionScreen from './components/RoleSelectionScreen';
 import GuardianApp from './GuardianApp';
 import ElderlyApp from './ElderlyApp';
+import { SafeZoneProvider } from './contexts/SafeZoneContext';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -43,11 +44,19 @@ const App: React.FC = () => {
     }
 
     if (role === 'guardian') {
-        return <GuardianApp onHeaderClick={handleRoleReset} />;
+        return (
+            <SafeZoneProvider>
+                <GuardianApp onHeaderClick={handleRoleReset} />
+            </SafeZoneProvider>
+        );
     }
 
     if (role === 'elderly') {
-        return <ElderlyApp onHeaderClick={handleRoleReset} />;
+        return (
+            <SafeZoneProvider>
+                <ElderlyApp onHeaderClick={handleRoleReset} />
+            </SafeZoneProvider>
+        );
     }
 
     // Fallback just in case

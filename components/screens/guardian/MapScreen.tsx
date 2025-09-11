@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { Memory, dummyMemories } from '../../../types/memory';
+import SafeZoneModal from '../../modals/SafeZoneModal';
+import { useSafeZone } from '../../../contexts/SafeZoneContext';
 import LocationPinIcon from '../../icons/LocationPinIcon';
 import RocketIcon from '../../icons/RocketIcon';
 import ClockIcon from '../../icons/ClockIcon';
@@ -27,6 +29,8 @@ declare global {
 
 const MapScreen: React.FC = () => {
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+    const [isSafeZoneModalOpen, setIsSafeZoneModalOpen] = useState(false);
+    const { safeZone, updateSafeZone } = useSafeZone();
     const mapRef = useRef<google.maps.Map | null>(null);
 
     const handleMemoryClick = (memory: Memory) => {
@@ -35,6 +39,10 @@ const MapScreen: React.FC = () => {
 
     const handleMapLoad = (map: google.maps.Map) => {
         mapRef.current = map;
+    };
+
+    const handleSafeZoneSave = (center: { lat: number; lng: number }, radius: number) => {
+        updateSafeZone(center, radius);
     };
 
     return (
@@ -101,19 +109,33 @@ const MapScreen: React.FC = () => {
             <div className="bg-white p-4 mx-4 mb-4 rounded-3xl shadow-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold text-gray-800">안심 구역 설정</h2>
-                    <button className="px-4 py-1.5 text-sm font-semibold border-2 border-gray-300 rounded-full hover:bg-gray-100 transition">편집</button>
+                    <button 
+                        onClick={() => setIsSafeZoneModalOpen(true)}
+                        className="px-4 py-1.5 text-sm font-semibold border-2 border-gray-300 rounded-full hover:bg-gray-100 transition"
+                    >
+                        편집
+                    </button>
                 </div>
                 <div className="space-y-3">
                     <div className="bg-lime-50 border border-lime-200 p-3 rounded-xl flex items-center gap-3">
                          <LocationPinIcon className="w-5 h-5 text-green-600"/>
-                         <p className="text-gray-700">현재 반경: <span className="font-bold">500m</span></p>
+                         <p className="text-gray-700">현재 반경: <span className="font-bold">{safeZone.radius}m</span></p>
                     </div>
                     <div className="bg-lime-50 border border-lime-200 p-3 rounded-xl flex items-center gap-3">
                         <PaperPlaneIcon className="w-5 h-5 text-green-600"/>
-                        <p className="text-gray-700">중심 위치: 대구광역시 남구 동동로 20</p>
+                        <p className="text-gray-700">중심 위치: {safeZone.center.lat.toFixed(4)}, {safeZone.center.lng.toFixed(4)}</p>
                     </div>
                 </div>
             </div>
+
+            {/* Safe Zone Modal */}
+            <SafeZoneModal
+                isOpen={isSafeZoneModalOpen}
+                onClose={() => setIsSafeZoneModalOpen(false)}
+                onSave={handleSafeZoneSave}
+                currentCenter={safeZone.center}
+                currentRadius={safeZone.radius}
+            />
         </div>
     );
 };

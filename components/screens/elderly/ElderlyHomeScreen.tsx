@@ -3,8 +3,6 @@ import PuzzleCameraIcon from '../../icons/PuzzleCameraIcon';
 import PuzzleBookIcon from '../../icons/PuzzleBookIcon';
 import PuzzlePillIcon from '../../icons/PuzzlePillIcon';
 import HelpPhoneIcon from '../../icons/HelpPhoneIcon';
-import NotificationBellIcon from '../../icons/NotificationBellIcon';
-import PuzzleLogo from '../../icons/PuzzleLogo';
 
 interface ElderlyHomeScreenProps {
     setShowModal: (show: boolean) => void;
@@ -36,18 +34,8 @@ const PillIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, setActiveTab }) => {
     return (
         <div className="min-h-screen bg-[#f9f8f4]">
-            {/* Header Section */}
+            {/* Welcome Section */}
             <div className="px-6 pt-6 pb-4">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <PuzzleLogo className="w-8 h-8" />
-                        <h1 className="text-xl font-bold text-[#3e8e5a]">조각조각</h1>
-                    </div>
-                    <div className="relative">
-                        <NotificationBellIcon className="w-6 h-6 text-gray-600" />
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full"></div>
-                    </div>
-                </div>
                 <h2 className="text-lg text-gray-700">환영합니다, 어르신</h2>
             </div>
 
@@ -120,13 +108,13 @@ const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, set
                 </div>
 
                 {/* Help Request Button */}
-                <button
-                    onClick={() => alert('보호자에게 전화합니다.')}
-                    className="w-full bg-red-500 text-white rounded-full py-4 text-lg font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-red-600 transition-transform transform hover:scale-105 mb-6"
+                <a
+                    href="tel:01037177644"
+                    className="w-full bg-red-500 text-white rounded-full py-4 text-lg font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-red-600 transition-transform transform hover:scale-105 mb-6 inline-block"
                 >
                     <HelpPhoneIcon className="w-5 h-5" />
                     도움 요청
-                </button>
+                </a>
             </div>
         </div>
     );

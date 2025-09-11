@@ -38,7 +38,7 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
     const getHeaderTitle = () => {
         switch (activeTab) {
             case 'home':
-                return '';
+                return '조각조각';
             case 'gallery':
                  return '인물 찾기';
             case 'map':
@@ -54,7 +54,7 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
 
     return (
         <div className="h-screen w-screen bg-[#f9f8f4] flex flex-col antialiased">
-            {activeTab !== 'home' && <AppHeader title={getHeaderTitle()} onTitleClick={onHeaderClick} />}
+            <AppHeader title={getHeaderTitle()} onTitleClick={onHeaderClick} />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}
             </main>
