@@ -132,12 +132,35 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
 
   if (!isOpen) return null;
 
-  // 모바일 디버깅
-  console.log('SafeZoneModal rendering on mobile:', window.innerWidth < 768, 'isOpen:', isOpen);
+  // PWA 디버깅
+  console.log('SafeZoneModal rendering:', {
+    isOpen,
+    isMobile: window.innerWidth < 768,
+    isPWA: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone,
+    viewportHeight: window.innerHeight,
+    userAgent: navigator.userAgent
+  });
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-2 sm:p-4 touch-manipulation">
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col mx-2 sm:mx-0">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-2 sm:p-4 touch-manipulation pwa-modal"
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        WebkitOverflowScrolling: 'touch'
+      }}
+    >
+      <div 
+        className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] sm:max-h-[90vh] flex flex-col mx-2 sm:mx-0 pwa-modal-content"
+        style={{
+          maxHeight: '90vh',
+          overflow: 'hidden'
+        }}
+      >
         {/* Header - 고정 */}
         <div className="p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex justify-between items-center">
