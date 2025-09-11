@@ -231,5 +231,3 @@ const ElderlyMapScreen: React.FC = () => {
 };
 
 export default ElderlyMapScreen;
-
-

@@ -85,6 +85,7 @@ interface GoogleMapProps {
   onMemoryClick?: (memory: Memory) => void;
   selectedMemoryId?: string;
   onMapLoad?: (map: google.maps.Map) => void;
+  onMapClick?: (lat: number, lng: number) => void;
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({ 
@@ -94,7 +95,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   memories = [],
   onMemoryClick,
   selectedMemoryId,
-  onMapLoad
+  onMapLoad,
+  onMapClick
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -118,6 +120,15 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         // 커스텀 지도 스타일 적용
         styles: mapStyles
       });
+
+      // 지도 클릭 이벤트 추가
+      if (onMapClick) {
+        mapInstanceRef.current.addListener('click', (event: any) => {
+          const lat = event.latLng.lat();
+          const lng = event.latLng.lng();
+          onMapClick(lat, lng);
+        });
+      }
 
       // 현재 위치 마커 추가
       new google.maps.Marker({
