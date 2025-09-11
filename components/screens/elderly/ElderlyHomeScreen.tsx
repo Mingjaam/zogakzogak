@@ -25,11 +25,10 @@ const MainFeatureButton: React.FC<{
     </div>
 );
 
-const PillIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <path d="M11.2929 2.29289C12.4645 1.12132 14.3396 1.12132 15.5112 2.29289L21.7071 8.48883C22.8787 9.66041 22.8787 11.5355 21.7071 12.7071L12.7071 21.7071C11.5355 22.8787 9.66041 22.8787 8.48883 21.7071L2.29289 15.5112C1.12132 14.3396 1.12132 12.4645 2.29289 11.2929L11.2929 2.29289Z" stroke="currentColor" strokeWidth="2" />
-    </svg>
-);
+const PillIcon: React.FC<{ className?: string }> = ({ className }) => {
+    const iconSrc = 'https://i.imgur.com/nLC8vRQ.png';
+    return <img src={iconSrc} alt="약 복용 아이콘" className={className} />;
+};
 
 const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, setActiveTab }) => {
     return (
