@@ -46,7 +46,12 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onClose }) => {
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             if (context) {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                // 좌우반전을 위해 context를 변환
+                context.save();
+                context.scale(-1, 1);
+                context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                context.restore();
+                
                 const dataUrl = canvas.toDataURL('image/jpeg');
                 const base64 = dataUrl.split(',')[1];
                 onCapture(base64);
@@ -62,7 +67,8 @@ const CameraView: React.FC<CameraViewProps> = ({ onCapture, onClose }) => {
                     ref={videoRef} 
                     autoPlay 
                     playsInline 
-                    className="w-full h-full object-cover scale-x-[-1]" 
+                    className="w-full h-full object-cover"
+                    style={{ transform: 'scaleX(-1)' }}
                 />
                 {/* 카메라 오버레이 UI */}
                 <div className="absolute inset-0 pointer-events-none">
