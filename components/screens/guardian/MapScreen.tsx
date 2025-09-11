@@ -125,6 +125,48 @@ const MapScreen: React.FC = () => {
                         <PaperPlaneIcon className="w-5 h-5 text-green-600"/>
                         <p className="text-gray-700">중심 위치: {safeZone.center.lat.toFixed(4)}, {safeZone.center.lng.toFixed(4)}</p>
                     </div>
+                    
+                    {/* 안심 구역 미리보기 지도 */}
+                    <div className="bg-gray-100 rounded-xl overflow-hidden" style={{ height: '200px' }}>
+                        <GoogleMap 
+                            center={safeZone.center}
+                            zoom={15}
+                            className="w-full h-full"
+                            memories={[]}
+                            onMemoryClick={() => {}}
+                            selectedMemoryId={null}
+                            onMapLoad={(map) => {
+                                // 안심 구역 원 그리기
+                                if (window.google && window.google.maps) {
+                                    new window.google.maps.Circle({
+                                        strokeColor: '#70c18c',
+                                        strokeOpacity: 0.8,
+                                        strokeWeight: 2,
+                                        fillColor: '#70c18c',
+                                        fillOpacity: 0.2,
+                                        map: map,
+                                        center: safeZone.center,
+                                        radius: safeZone.radius
+                                    });
+                                    
+                                    // 중심 마커 (집 모양)
+                                    new window.google.maps.Marker({
+                                        position: safeZone.center,
+                                        map: map,
+                                        icon: {
+                                            path: 'M10 2L3 7v11h4v-6h6v6h4V7l-7-5z',
+                                            fillColor: '#70c18c',
+                                            fillOpacity: 1,
+                                            strokeColor: '#ffffff',
+                                            strokeWeight: 2,
+                                            scale: 1.5,
+                                            anchor: new window.google.maps.Point(10, 20)
+                                        }
+                                    });
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
 
