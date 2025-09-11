@@ -13,16 +13,18 @@ const MainFeatureButton: React.FC<{
     icon: React.ReactNode;
     label: string;
     onClick: () => void;
-}> = ({ icon, label, onClick }) => (
-    <div className="flex flex-col items-center gap-3">
-        <button
-            onClick={onClick}
-            className="bg-white rounded-full w-20 h-20 flex items-center justify-center shadow-lg transition-transform transform hover:scale-105"
-        >
+    bgColor?: string;
+    iconBgColor?: string;
+}> = ({ icon, label, onClick, bgColor = "bg-white", iconBgColor = "bg-gray-50" }) => (
+    <button
+        onClick={onClick}
+        className={`flex flex-col items-center gap-3 ${bgColor} rounded-2xl shadow-lg p-4 hover:shadow-xl transition-all duration-200 active:scale-95 min-w-[100px] touch-manipulation flex-1`}
+    >
+        <div className={`w-12 h-12 flex items-center justify-center ${iconBgColor} rounded-xl`}>
             {icon}
-        </button>
-        <span className="font-semibold text-gray-700 text-sm">{label}</span>
-    </div>
+        </div>
+        <span className="font-semibold text-gray-700 text-sm text-center">{label}</span>
+    </button>
 );
 
 const PillIcon: React.FC<{ className?: string }> = ({ className }) => {
@@ -41,21 +43,27 @@ const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, set
             {/* Main Content */}
             <div className="px-6 space-y-6">
                 {/* Main Feature Buttons */}
-                <div className="flex justify-around items-center py-4">
+                <div className="flex justify-between items-stretch gap-3 py-4">
                     <MainFeatureButton
                         icon={<PuzzleCameraIcon className="w-11 h-11" />}
                         label="인물 찾기"
                         onClick={() => setActiveTab('gallery')}
+                        bgColor="bg-blue-50"
+                        iconBgColor="bg-blue-100"
                     />
                     <MainFeatureButton
                         icon={<PuzzleBookIcon className="w-11 h-11" />}
                         label="추억 찾기"
                         onClick={() => setActiveTab('map')}
+                        bgColor="bg-green-50"
+                        iconBgColor="bg-green-100"
                     />
                     <MainFeatureButton
                         icon={<PuzzlePillIcon className="w-11 h-11" />}
                         label="약 복용"
                         onClick={() => setActiveTab('notifications')}
+                        bgColor="bg-orange-50"
+                        iconBgColor="bg-orange-100"
                     />
                 </div>
 
