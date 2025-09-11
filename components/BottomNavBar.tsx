@@ -36,21 +36,21 @@ const NavItem: React.FC<{
 
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, setActiveTab }) => {
     return (
-        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center z-20">
+        <nav className="fixed bottom-4 left-4 right-4 h-16 bg-white/95 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-2xl flex justify-around items-center z-50 border border-white/20">
             <NavItem tabName="home" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <HomeIcon className="w-7 h-7" />
+                <HomeIcon className="w-6 h-6" />
             </NavItem>
             <NavItem tabName="gallery" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <GalleryIcon className="w-7 h-7" />
+                <GalleryIcon className="w-6 h-6" />
             </NavItem>
             <NavItem tabName="map" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <MapIcon className="w-7 h-7" />
+                <MapIcon className="w-6 h-6" />
             </NavItem>
             <NavItem tabName="notifications" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <BellIcon className="w-7 h-7" />
+                <BellIcon className="w-6 h-6" />
             </NavItem>
             <NavItem tabName="profile" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <UserIcon className="w-7 h-7" />
+                <UserIcon className="w-6 h-6" />
             </NavItem>
         </nav>
     );

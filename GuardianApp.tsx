@@ -53,7 +53,7 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
     return (
         <div className="h-screen w-screen bg-[#f9f8f4] flex flex-col antialiased">
             <AppHeader title={getHeaderTitle()} onTitleClick={onHeaderClick} />
-            <main className="flex-grow overflow-y-auto pb-20">
+            <main className="flex-grow overflow-y-auto pb-24">
                 {renderContent()}
             </main>
             <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
