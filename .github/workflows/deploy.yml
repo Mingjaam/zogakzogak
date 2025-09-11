@@ -45,4 +45,5 @@ jobs:
         publish_dir: ./dist
         external_repository: Mingjaam/mingjaam.github.io
         destination_dir: zogakzogak
+        target_branch: main
         
