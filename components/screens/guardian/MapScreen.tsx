@@ -39,6 +39,57 @@ const MapScreen: React.FC = () => {
 
     const handleMapLoad = (map: google.maps.Map) => {
         mapRef.current = map;
+        
+        // 어르신 현재 위치 마커 추가
+        const elderlyLocation = { lat: 35.8714, lng: 128.6014 }; // 실제로는 API에서 가져와야 함
+        
+        new google.maps.Marker({
+            position: elderlyLocation,
+            map: map,
+            title: '어르신 현재 위치',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" fill="#70c18c" stroke="white" stroke-width="3"/>
+                    <circle cx="16" cy="16" r="6" fill="white"/>
+                  </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32),
+            }
+        });
+        
+        // 안전구역 원 그리기
+        new google.maps.Circle({
+            strokeColor: '#70c18c',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#70c18c',
+            fillOpacity: 0.2,
+            map: map,
+            center: safeZone.center,
+            radius: safeZone.radius
+        });
+        
+        // 안전구역 중심 마커 (집 모양)
+        new google.maps.Marker({
+            position: safeZone.center,
+            map: map,
+            title: '안전구역 중심',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 4L28 12V26C28 27.1046 27.1046 28 26 28H20V20C20 19.4477 19.5523 19 19 19H13C12.4477 19 12 19.4477 12 20V28H6C4.89543 28 4 27.1046 4 26V12L16 4Z" fill="#70c18c" stroke="white" stroke-width="2"/>
+                    <rect x="12" y="20" width="8" height="8" fill="white"/>
+                    <rect x="14" y="22" width="2" height="2" fill="#70c18c"/>
+                    <rect x="18" y="22" width="2" height="2" fill="#70c18c"/>
+                    <rect x="14" y="26" width="2" height="2" fill="#70c18c"/>
+                    <rect x="18" y="26" width="2" height="2" fill="#70c18c"/>
+                  </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 32),
+            }
+        });
     };
 
     const handleSafeZoneSave = (center: { lat: number; lng: number }, radius: number) => {

@@ -160,7 +160,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
@@ -175,7 +175,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* 지도 */}
           <div className="h-80 rounded-2xl overflow-hidden border border-gray-200">
             <GoogleMap
