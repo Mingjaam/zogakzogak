@@ -45,8 +45,6 @@ jobs:
         publish_dir: ./dist
         external_repository: Mingjaam/mingjaam.github.io
         destination_dir: zogakzogak
-        keep_files: true
-        force_orphan: false
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
+        keep_files: false
+        force_orphan: true
         
