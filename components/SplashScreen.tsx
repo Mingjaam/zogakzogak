@@ -7,9 +7,9 @@ const SplashScreen: React.FC = () => {
             <div className="flex flex-col items-center justify-center gap-5 animate-fadeIn">
                 <div className="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl shadow-black/20">
                     <img 
-                        src="/zogakzogak/icon-192x192.png" 
+                        src="https://i.imgur.com/O0Z5u8g.png" 
                         alt="조각조각 로고" 
-                        className="w-24 h-24"
+                        className="w-26 h-24"
                     />
                 </div>
                 <div className="flex flex-col gap-2">
