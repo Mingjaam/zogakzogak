@@ -9,7 +9,7 @@ import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 import MedicationReminderModal from './components/modals/MedicationReminderModal';
 
-export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
+export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'notifications' | 'profile';
 
 interface ElderlyAppProps {
     onHeaderClick: () => void;
@@ -29,6 +29,8 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
                 return <ElderlyMapScreen />;
             case 'diary':
                 return <ElderlyDiaryScreen />;
+            case 'notifications':
+                return <ElderlyNotificationsScreen />;
             case 'profile':
                 return <ElderlyProfileScreen />;
             default:
@@ -46,6 +48,8 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
                 return '추억 찾기';
             case 'diary':
                 return '오늘의 일기';
+            case 'notifications':
+                return '약 복용 알림';
             case 'profile':
                 return '내 정보';
             default:
