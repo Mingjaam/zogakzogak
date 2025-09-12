@@ -5,6 +5,7 @@ import RoleSelectionScreen from './components/RoleSelectionScreen';
 import GuardianApp from './GuardianApp';
 import ElderlyApp from './ElderlyApp';
 import { SafeZoneProvider } from './contexts/SafeZoneContext';
+import { DiaryProvider } from './contexts/DiaryContext';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -45,17 +46,21 @@ const App: React.FC = () => {
 
     if (role === 'guardian') {
         return (
-            <SafeZoneProvider>
-                <GuardianApp onHeaderClick={handleRoleReset} />
-            </SafeZoneProvider>
+            <DiaryProvider>
+                <SafeZoneProvider>
+                    <GuardianApp onHeaderClick={handleRoleReset} />
+                </SafeZoneProvider>
+            </DiaryProvider>
         );
     }
 
     if (role === 'elderly') {
         return (
-            <SafeZoneProvider>
-                <ElderlyApp onHeaderClick={handleRoleReset} />
-            </SafeZoneProvider>
+            <DiaryProvider>
+                <SafeZoneProvider>
+                    <ElderlyApp onHeaderClick={handleRoleReset} />
+                </SafeZoneProvider>
+            </DiaryProvider>
         );
     }
 
