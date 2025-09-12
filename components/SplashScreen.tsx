@@ -9,7 +9,7 @@ const SplashScreen: React.FC = () => {
         const playStartupSound = () => {
             try {
                 const audio = new Audio('/sounds/startup.mp3');
-                audio.volume = 0.3; // 볼륨을 30%로 설정
+                audio.volume = 0.5; // 볼륨을 30%로 설정
                 audio.play().catch(error => {
                     console.log('사운드 재생 실패:', error);
                 });
