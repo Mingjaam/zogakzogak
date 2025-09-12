@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import UserIcon from './icons/UserIcon';
+import HomeIcon from './icons/HomeIcon';
 import PuzzleLogo from './icons/PuzzleLogo';
 
 interface AuthScreenProps {
@@ -183,23 +185,31 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         <button
                                             type="button"
                                             onClick={() => handleInputChange('role', 'SENIOR')}
-                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 ${
+                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'SENIOR'
                                                     ? 'bg-[#70c18c] text-white shadow-md'
                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                         >
+                                            <UserIcon 
+                                                className="w-6 h-6" 
+                                                isActive={registerData.role === 'SENIOR'} 
+                                            />
                                             어르신
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => handleInputChange('role', 'GUARDIAN')}
-                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 ${
+                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'GUARDIAN'
                                                     ? 'bg-[#70c18c] text-white shadow-md'
                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                         >
+                                            <HomeIcon 
+                                                className="w-6 h-6" 
+                                                isActive={registerData.role === 'GUARDIAN'} 
+                                            />
                                             보호자
                                         </button>
                                     </div>
