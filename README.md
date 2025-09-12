@@ -173,6 +173,29 @@ API 연결은 앱 내에서 직접 테스트할 수 있습니다. 회원가입 �
 - **인증 방식**: Bearer Token
 - **데이터 형식**: JSON
 
+### CORS 문제 해결
+GitHub Pages에서 API 호출 시 CORS 오류가 발생할 수 있습니다.
+
+#### 임시 해결책 (현재 적용됨)
+- CORS 프록시 사용 (`https://api.allorigins.win/raw?url=`)
+- 프로덕션 환경에서 자동으로 프록시 적용
+
+#### 권장 해결책 (백엔드 수정 필요)
+백엔드 서버에서 CORS 헤더를 추가해야 합니다:
+
+```javascript
+// 백엔드 CORS 설정 예시
+app.use(cors({
+  origin: [
+    'https://mingjaam.github.io',
+    'http://localhost:5173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With']
+}));
+```
+
 ## 📱 반응형 디자인
 
 - 모바일 우선 설계

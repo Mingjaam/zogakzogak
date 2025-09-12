@@ -3,6 +3,11 @@
 // HTTPS API 서버 사용
 const API_BASE_URL = 'https://zogakzogak.ddns.net/api';
 
+// CORS 프록시 URL (GitHub Pages용 - 임시 해결책)
+// 주의: 이는 임시 해결책이며, 백엔드에서 CORS 설정이 권장됩니다.
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+const PRODUCTION_API_URL = CORS_PROXY + encodeURIComponent(API_BASE_URL);
+
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -44,13 +49,20 @@ const createHeaders = (): HeadersInit => ({
   'Origin': window.location.origin,
 });
 
+// 환경에 따른 API URL 결정
+function getApiUrl(endpoint: string): string {
+  const isProduction = window.location.hostname === 'mingjaam.github.io';
+  const baseUrl = isProduction ? PRODUCTION_API_URL : API_BASE_URL;
+  return `${baseUrl}${endpoint}`;
+}
+
 // API 요청 래퍼 함수
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = getApiUrl(endpoint);
     console.log('API 요청:', url, options);
     
     const response = await fetch(url, {
