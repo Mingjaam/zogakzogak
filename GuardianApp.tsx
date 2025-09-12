@@ -8,7 +8,7 @@ import ProfileScreen from './components/screens/guardian/ProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 
-export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'notifications' | 'profile';
+export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
 interface GuardianAppProps {
     onHeaderClick: () => void;
@@ -25,8 +25,6 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
                 return <MapScreen />;
             case 'diary':
                 return <DiaryScreen />;
-            case 'notifications':
-                return <NotificationsScreen />;
             case 'gallery':
                 return <GalleryScreen />;
             case 'profile':
@@ -44,8 +42,6 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
                 return '안전구역 지도';
             case 'diary':
                 return '어르신의 일기';
-            case 'notifications':
-                return '보호자 알림';
             case 'gallery':
                  return '추억 앨범';
             case 'profile':
