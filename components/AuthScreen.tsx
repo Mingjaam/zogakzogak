@@ -1,7 +1,5 @@
 
 import React, { useState } from 'react';
-import UserIcon from './icons/UserIcon';
-import HomeIcon from './icons/HomeIcon';
 import PuzzleLogo from './icons/PuzzleLogo';
 
 interface AuthScreenProps {
@@ -191,9 +189,10 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                         >
-                                            <UserIcon 
-                                                className="w-6 h-6" 
-                                                isActive={registerData.role === 'SENIOR'} 
+                                            <img 
+                                                src="https://i.imgur.com/cZe1BTZ.png" 
+                                                alt="어르신" 
+                                                className="w-8 h-8 object-contain" 
                                             />
                                             어르신
                                         </button>
@@ -206,9 +205,10 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                         >
-                                            <HomeIcon 
-                                                className="w-6 h-6" 
-                                                isActive={registerData.role === 'GUARDIAN'} 
+                                            <img 
+                                                src="https://i.imgur.com/RjrEbYa.png" 
+                                                alt="보호자" 
+                                                className="w-8 h-8 object-contain" 
                                             />
                                             보호자
                                         </button>
