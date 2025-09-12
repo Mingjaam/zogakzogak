@@ -51,7 +51,7 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
     };
 
     return (
-        <div className="h-screen w-screen bg-[#f9f8f4] flex flex-col antialiased">
+        <div className="h-screen w-screen bg-white flex flex-col antialiased">
             <AppHeader 
                 title={getHeaderTitle()} 
                 onTitleClick={onHeaderClick}

@@ -25,7 +25,7 @@ const RoleCard: React.FC<{
 
 const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onSelectRole }) => {
     return (
-        <main className="bg-[#f9f8f4] min-h-screen w-screen flex flex-col antialiased">
+        <main className="bg-white min-h-screen w-screen flex flex-col antialiased">
             <header className="p-4 flex items-center gap-2">
                  <PuzzleLogo className="w-8 h-8"/>
                  <h1 className="text-xl font-bold text-gray-700">조각조각</h1>

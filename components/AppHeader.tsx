@@ -10,7 +10,7 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({ title, onTitleClick, onNotificationClick }) => {
   return (
-    <header className="bg-[#f9f8f4] p-4 flex justify-between items-center sticky top-0 z-10 w-full">
+    <header className="bg-white p-4 flex justify-between items-center sticky top-0 z-10 w-full">
         <button onClick={onTitleClick} className="flex items-center gap-2 cursor-pointer p-1 -ml-1 rounded-md hover:bg-gray-100 transition-colors">
             <PuzzleLogo className="w-8 h-8"/>
             <h1 className="text-lg font-bold text-gray-700">{title}</h1>

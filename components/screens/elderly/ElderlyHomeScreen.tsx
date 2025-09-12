@@ -34,7 +34,7 @@ const PillIcon: React.FC<{ className?: string }> = ({ className }) => {
 
 const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, setActiveTab }) => {
     return (
-        <div className="min-h-screen bg-[#f9f8f4]">
+        <div className="min-h-screen bg-white">
             {/* Welcome Section */}
             <div className="px-6 pt-6 pb-4">
                 <h2 className="text-lg text-gray-700">환영합니다, 어르신</h2>

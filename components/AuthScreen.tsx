@@ -14,7 +14,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
     };
 
     return (
-        <main className="bg-[#f9f8f4] min-h-screen w-screen flex flex-col items-center justify-center p-4 antialiased">
+        <main className="bg-white min-h-screen w-screen flex flex-col items-center justify-center p-4 antialiased">
             <div className="w-full max-w-sm mx-auto">
                 <div className="flex flex-col items-center text-center mb-8">
                     <img src="http://imgur.com/O0Z5u8g.png" alt="조각조각 로고" className="w-45 h-40" />
