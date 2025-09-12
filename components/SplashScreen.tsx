@@ -1,7 +1,35 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const SplashScreen: React.FC = () => {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        // 사운드 파일 재생
+        const playStartupSound = () => {
+            try {
+                const audio = new Audio('/sounds/startup.mp3');
+                audio.volume = 0.3; // 볼륨을 30%로 설정
+                audio.play().catch(error => {
+                    console.log('사운드 재생 실패:', error);
+                });
+                audioRef.current = audio;
+            } catch (error) {
+                console.log('사운드 로드 실패:', error);
+            }
+        };
+
+        // 컴포넌트 마운트 시 사운드 재생
+        playStartupSound();
+
+        // 컴포넌트 언마운트 시 오디오 정리
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
     return (
         <main className="bg-[#70c18c] h-screen w-screen flex flex-col items-center justify-center text-center text-white antialiased">
             <div className="flex flex-col items-center justify-center gap-5 animate-fadeIn">
