@@ -18,8 +18,13 @@ interface ElderlyAppProps {
 const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
     const [activeTab, setActiveTab] = useState<TabName>('home');
     const [showMedicationModal, setShowMedicationModal] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
 
     const renderContent = () => {
+        if (showNotifications) {
+            return <ElderlyNotificationsScreen onBack={() => setShowNotifications(false)} />;
+        }
+        
         switch (activeTab) {
             case 'home':
                 return <ElderlyHomeScreen setShowModal={setShowMedicationModal} setActiveTab={setActiveTab} />;
@@ -37,6 +42,10 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
     };
     
     const getHeaderTitle = () => {
+        if (showNotifications) {
+            return '약 복용 알림';
+        }
+        
         switch (activeTab) {
             case 'home':
                 return '조각조각';
@@ -58,7 +67,7 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
             <AppHeader 
                 title={getHeaderTitle()} 
                 onTitleClick={onHeaderClick}
-                onNotificationClick={() => setActiveTab('notifications')}
+                onNotificationClick={() => setShowNotifications(true)}
             />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}

@@ -16,8 +16,13 @@ interface GuardianAppProps {
 
 const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
     const [activeTab, setActiveTab] = useState<TabName>('home');
+    const [showNotifications, setShowNotifications] = useState(false);
 
     const renderContent = () => {
+        if (showNotifications) {
+            return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+        }
+        
         switch (activeTab) {
             case 'home':
                 return <HomeScreen />;
@@ -35,6 +40,10 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
     };
     
     const getHeaderTitle = () => {
+        if (showNotifications) {
+            return '보호자 알림';
+        }
+        
         switch (activeTab) {
             case 'home':
                 return '환영합니다, 보호자님';
@@ -56,7 +65,7 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
             <AppHeader 
                 title={getHeaderTitle()} 
                 onTitleClick={onHeaderClick}
-                onNotificationClick={() => setActiveTab('notifications')}
+                onNotificationClick={() => setShowNotifications(true)}
             />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}

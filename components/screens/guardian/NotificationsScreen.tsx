@@ -4,6 +4,10 @@ import CheckCircleIcon from '../../icons/CheckCircleIcon';
 import ClockIcon from '../../icons/ClockIcon';
 import WarningIcon from '../../icons/WarningIcon';
 
+interface NotificationsScreenProps {
+  onBack?: () => void;
+}
+
 type NotificationItemProps = { type: 'safe' | 'warning', message: string, time: string };
 
 const NotificationItem = ({ type, message, time }: NotificationItemProps) => {
@@ -29,7 +33,7 @@ const NotificationItem = ({ type, message, time }: NotificationItemProps) => {
 };
 
 
-const NotificationsScreen: React.FC = () => {
+const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => {
     const notifications: NotificationItemProps[] = [
         { type: 'safe', message: '안전지대로 돌아왔습니다', time: '10분 전' },
         { type: 'warning', message: '안전지대를 벗어났습니다', time: '50분 전' },
@@ -42,11 +46,21 @@ const NotificationsScreen: React.FC = () => {
     return (
         <div className="p-4">
             <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-gray-100 p-2 rounded-full">
-                      <BellIcon className="w-6 h-6 text-gray-500" />
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-gray-100 p-2 rounded-full">
+                          <BellIcon className="w-6 h-6 text-gray-500" />
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-800">알림</h2>
                     </div>
-                    <h2 className="text-xl font-bold text-gray-800">알림</h2>
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                            뒤로가기
+                        </button>
+                    )}
                 </div>
                 <div className="space-y-4">
                     {notifications.map((item, index) => (
