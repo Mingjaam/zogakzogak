@@ -72,6 +72,8 @@ interface SharedDataContextType {
   // 연결된 사용자 정보
   connectedUser: any | null;
   isConnected: boolean;
+  connectWithUser: (email: string) => void;
+  disconnectUser: () => void;
   
   // 데이터 동기화
   syncData: () => Promise<void>;
@@ -98,18 +100,29 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
   useEffect(() => {
     if (isAuthenticated && user) {
       checkConnectionAndSync();
-      
-      // 연결 상태 시뮬레이션 (실제로는 API에서 가져와야 함)
-      // 현재는 모든 사용자가 연결된 것으로 가정
-      setIsConnected(true);
-      setConnectedUser({
-        id: 'connected_user',
-        name: user.role === 'SENIOR' ? '보호자' : '어르신',
-        email: user.role === 'SENIOR' ? 'guardian@example.com' : 'elderly@example.com',
-        role: user.role === 'SENIOR' ? 'GUARDIAN' : 'SENIOR'
-      });
+      checkConnectionStatus();
     }
   }, [isAuthenticated, user]);
+
+  // 연결 상태 확인 (로컬 스토리지 기반)
+  const checkConnectionStatus = () => {
+    try {
+      const connectionData = localStorage.getItem('user_connection');
+      if (connectionData) {
+        const { isConnected: storedConnection, connectedUser: storedUser } = JSON.parse(connectionData);
+        setIsConnected(storedConnection);
+        setConnectedUser(storedUser);
+      } else {
+        // 연결되지 않은 상태로 초기화
+        setIsConnected(false);
+        setConnectedUser(null);
+      }
+    } catch (error) {
+      console.error('연결 상태 확인 오류:', error);
+      setIsConnected(false);
+      setConnectedUser(null);
+    }
+  };
 
   const checkConnectionAndSync = async () => {
     setIsLoading(true);
@@ -312,6 +325,42 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
     saveToStorage('shared_notifications', updatedNotifications);
   };
 
+  // 연결 함수들
+  const connectWithUser = (email: string) => {
+    // 이메일로 연결 요청 시뮬레이션
+    const connectionData = {
+      isConnected: true,
+      connectedUser: {
+        id: `user_${Date.now()}`,
+        name: email.includes('guardian') ? '보호자' : '어르신',
+        email: email,
+        role: email.includes('guardian') ? 'GUARDIAN' : 'SENIOR'
+      }
+    };
+    
+    localStorage.setItem('user_connection', JSON.stringify(connectionData));
+    setIsConnected(true);
+    setConnectedUser(connectionData.connectedUser);
+    
+    // 연결 성공 알림 추가
+    addNotification({
+      fromUserId: user?.id || '',
+      fromUserName: user?.name || '',
+      toUserId: connectionData.connectedUser.id,
+      toUserName: connectionData.connectedUser.name,
+      type: 'MEMORY',
+      title: '연결 요청이 전송되었습니다',
+      message: `${email}로 연결 요청을 보냈습니다.`,
+      isRead: false,
+    });
+  };
+
+  const disconnectUser = () => {
+    localStorage.removeItem('user_connection');
+    setIsConnected(false);
+    setConnectedUser(null);
+  };
+
   // 데이터 동기화
   const syncData = async () => {
     setIsLoading(true);
@@ -372,6 +421,8 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
     markNotificationAsRead,
     connectedUser,
     isConnected,
+    connectWithUser,
+    disconnectUser,
     syncData,
     isLoading,
   };

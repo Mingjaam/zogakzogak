@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { checkConnectionStatus, getConnectionRequests, acceptConnectionRequest } from '../lib/api';
+import { useSharedData } from '../contexts/SharedDataContext';
 import ConnectionRequestModal from './modals/ConnectionRequestModal';
-import { ConnectionRequest } from '../lib/api';
 
 interface ConnectionScreenProps {
   onConnectionUpdate?: () => void;
@@ -10,59 +9,16 @@ interface ConnectionScreenProps {
 
 const ConnectionScreen: React.FC<ConnectionScreenProps> = ({ onConnectionUpdate }) => {
   const { user } = useAuth();
-  const [isConnected, setIsConnected] = useState(false);
-  const [connectedUser, setConnectedUser] = useState<any>(null);
-  const [connectionRequests, setConnectionRequests] = useState<ConnectionRequest[]>([]);
+  const { isConnected, connectedUser, connectWithUser } = useSharedData();
   const [isLoading, setIsLoading] = useState(true);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
 
   useEffect(() => {
-    checkConnection();
-  }, []);
-
-  const checkConnection = async () => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) return;
-
-      const response = await checkConnectionStatus(token);
-      if (response.success && response.data) {
-        setIsConnected(response.data.isConnected);
-        setConnectedUser(response.data.connectedUser);
-      }
-
-      // 연결 요청 목록도 가져오기
-      const requestsResponse = await getConnectionRequests(token);
-      if (requestsResponse.success && requestsResponse.data) {
-        setConnectionRequests(requestsResponse.data.requests);
-      }
-    } catch (error) {
-      console.error('연결 상태 확인 오류:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAcceptRequest = async (requestId: string) => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) return;
-
-      const response = await acceptConnectionRequest(token, requestId);
-      if (response.success) {
-        alert('연결 요청을 수락했습니다!');
-        checkConnection(); // 상태 다시 확인
-      } else {
-        alert('연결 요청 수락에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('연결 요청 수락 오류:', error);
-      alert('연결 요청 수락 중 오류가 발생했습니다.');
-    }
-  };
+    // 연결 상태 확인 완료
+    setIsLoading(false);
+  }, [isConnected]);
 
   const handleConnectionSuccess = () => {
-    checkConnection(); // 상태 다시 확인
     onConnectionUpdate?.(); // 부모 컴포넌트에 연결 상태 업데이트 알림
   };
 
@@ -97,9 +53,18 @@ const ConnectionScreen: React.FC<ConnectionScreenProps> = ({ onConnectionUpdate 
                 <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                 <span className="font-semibold text-green-800">연결됨</span>
               </div>
-              <p className="text-green-700 text-sm">
+              <p className="text-green-700 text-sm mb-4">
                 {connectedUser?.name}님과 연결되어 있습니다.
               </p>
+              <p className="text-green-600 text-xs mb-4">
+                이제 서로의 정보를 공유할 수 있습니다.
+              </p>
+              <button
+                onClick={() => onConnectionUpdate?.()}
+                className="w-full py-3 px-4 bg-[#70c18c] text-white rounded-lg hover:bg-[#5da576] transition-colors"
+              >
+                메인으로 이동
+              </button>
             </div>
           ) : (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -120,44 +85,6 @@ const ConnectionScreen: React.FC<ConnectionScreenProps> = ({ onConnectionUpdate 
           )}
         </div>
 
-        {/* 연결 요청 목록 */}
-        {connectionRequests.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">연결 요청</h2>
-            <div className="space-y-3">
-              {connectionRequests.map((request) => (
-                <div key={request.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-800">
-                        {request.fromUser.name}님의 요청
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {request.fromUser.email}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(request.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    {request.status === 'PENDING' && (
-                      <button
-                        onClick={() => handleAcceptRequest(request.id)}
-                        className="px-4 py-2 bg-[#70c18c] text-white rounded-lg hover:bg-[#5da576] transition-colors text-sm"
-                      >
-                        수락
-                      </button>
-                    )}
-                    {request.status === 'ACCEPTED' && (
-                      <span className="px-4 py-2 bg-green-100 text-green-800 rounded-lg text-sm">
-                        수락됨
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <ConnectionRequestModal

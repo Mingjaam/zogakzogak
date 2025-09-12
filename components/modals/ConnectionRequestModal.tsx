@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { sendConnectionRequest } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSharedData } from '../../contexts/SharedDataContext';
 
 interface ConnectionRequestModalProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ const ConnectionRequestModal: React.FC<ConnectionRequestModalProps> = ({
   onSuccess 
 }) => {
   const { user } = useAuth();
+  const { connectWithUser } = useSharedData();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -26,23 +27,26 @@ const ConnectionRequestModal: React.FC<ConnectionRequestModalProps> = ({
     setSuccessMessage('');
 
     try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        setErrorMessage('로그인이 필요합니다.');
+      if (!email.trim()) {
+        setErrorMessage('이메일을 입력해주세요.');
         return;
       }
 
-      const response = await sendConnectionRequest(token, email);
-      
-      if (response.success) {
-        setSuccessMessage('연결 요청이 전송되었습니다!');
-        setTimeout(() => {
-          onSuccess();
-          onClose();
-        }, 2000);
-      } else {
-        setErrorMessage(response.message || '연결 요청 전송에 실패했습니다.');
+      // 이메일 형식 검증
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrorMessage('올바른 이메일 형식을 입력해주세요.');
+        return;
       }
+
+      // 연결 시뮬레이션
+      connectWithUser(email);
+      
+      setSuccessMessage('연결 요청이 전송되었습니다!');
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 2000);
     } catch (error) {
       console.error('연결 요청 오류:', error);
       setErrorMessage('연결 요청 중 오류가 발생했습니다.');

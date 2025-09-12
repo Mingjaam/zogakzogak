@@ -8,15 +8,13 @@ import ElderlyApp from './ElderlyApp';
 import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { SharedDataProvider } from './contexts/SharedDataContext';
-import { checkConnectionStatus } from './lib/api';
+import { SharedDataProvider, useSharedData } from './contexts/SharedDataContext';
 
 const AppContent: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [role, setRole] = useState<'guardian' | 'elderly' | null>(null);
-    const [isConnected, setIsConnected] = useState<boolean | null>(null);
-    const [isCheckingConnection, setIsCheckingConnection] = useState<boolean>(false);
     const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+    const { isConnected, isLoading: sharedDataLoading } = useSharedData();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -38,11 +36,11 @@ const AppContent: React.FC = () => {
 
     const handleRoleReset = () => {
         setRole(null);
-        setIsConnected(null);
     };
 
     const handleConnectionUpdate = () => {
-        setIsConnected(null); // 연결 상태 다시 확인
+        // SharedDataContext에서 연결 상태를 관리하므로 별도 처리 불필요
+        console.log('연결 상태 업데이트됨');
     };
 
     // 사용자 역할에 따라 자동으로 역할 설정
@@ -59,16 +57,7 @@ const AppContent: React.FC = () => {
         }
     }, [user, role]);
 
-    // 연결 상태 확인 (현재는 자동으로 연결된 것으로 가정)
-    useEffect(() => {
-        if (isAuthenticated && user && role && isConnected === null) {
-            // 현재는 모든 사용자가 자동으로 연결된 것으로 가정
-            setIsConnected(true);
-            console.log('자동 연결 완료');
-        }
-    }, [isAuthenticated, user, role, isConnected]);
-
-    if (loading || authLoading) {
+    if (loading || authLoading || sharedDataLoading) {
         return <SplashScreen />;
     }
 
@@ -80,18 +69,6 @@ const AppContent: React.FC = () => {
         return <RoleSelectionScreen onSelectRole={handleRoleSelect} />;
     }
 
-    // 연결 상태 확인 중
-    if (isCheckingConnection) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#70c18c] mx-auto mb-4"></div>
-                    <p className="text-gray-600">연결 상태를 확인하는 중...</p>
-                </div>
-            </div>
-        );
-    }
-
     // 연결되지 않은 경우 연결 화면 표시
     if (isConnected === false) {
         return <ConnectionScreen onConnectionUpdate={handleConnectionUpdate} />;
@@ -99,25 +76,21 @@ const AppContent: React.FC = () => {
 
     if (role === 'guardian') {
         return (
-            <SharedDataProvider>
-                <DiaryProvider>
-                    <SafeZoneProvider>
-                        <GuardianApp onHeaderClick={handleRoleReset} />
-                    </SafeZoneProvider>
-                </DiaryProvider>
-            </SharedDataProvider>
+            <DiaryProvider>
+                <SafeZoneProvider>
+                    <GuardianApp onHeaderClick={handleRoleReset} />
+                </SafeZoneProvider>
+            </DiaryProvider>
         );
     }
 
     if (role === 'elderly') {
         return (
-            <SharedDataProvider>
-                <DiaryProvider>
-                    <SafeZoneProvider>
-                        <ElderlyApp onHeaderClick={handleRoleReset} />
-                    </SafeZoneProvider>
-                </DiaryProvider>
-            </SharedDataProvider>
+            <DiaryProvider>
+                <SafeZoneProvider>
+                    <ElderlyApp onHeaderClick={handleRoleReset} />
+                </SafeZoneProvider>
+            </DiaryProvider>
         );
     }
 
@@ -132,7 +105,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <AuthProvider>
-            <AppContent />
+            <SharedDataProvider>
+                <AppContent />
+            </SharedDataProvider>
         </AuthProvider>
     );
 };
