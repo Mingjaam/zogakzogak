@@ -290,9 +290,9 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
               </div>
 
               {/* 사용법 안내 */}
-              <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-                <h3 className="text-sm font-medium text-green-800 mb-2">💡 사용법</h3>
-                <div className="space-y-2 text-sm text-green-700">
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-lg">
+                <h3 className="text-sm font-medium text-gray-800 mb-2">💡 사용법</h3>
+                <div className="space-y-2 text-sm text-gray-700">
                   <p>• <strong>지도 클릭:</strong> 원하는 위치를 클릭하여 중심점 설정</p>
                   <p>• <strong>마커 드래그:</strong> 집 모양 마커를 드래그하여 정확한 위치 조정</p>
                   <p>• <strong>슬라이더:</strong> 반경을 100m~2000m 범위에서 조정</p>

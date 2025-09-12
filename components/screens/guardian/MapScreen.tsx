@@ -141,12 +141,12 @@ const MapScreen: React.FC = () => {
                         </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="bg-lime-50 border border-lime-200 p-2 rounded-lg flex items-center gap-2">
-                            <LocationPinIcon className="w-4 h-4 text-green-600"/>
+                        <div className="bg-white border border-gray-200 p-2 rounded-lg flex items-center gap-2">
+                            <LocationPinIcon className="w-4 h-4 text-gray-600"/>
                             <span className="text-gray-700">반경: <span className="font-bold">{safeZone.radius}m</span></span>
                         </div>
-                        <div className="bg-lime-50 border border-lime-200 p-2 rounded-lg flex items-center gap-2">
-                            <PaperPlaneIcon className="w-4 h-4 text-green-600"/>
+                        <div className="bg-white border border-gray-200 p-2 rounded-lg flex items-center gap-2">
+                            <PaperPlaneIcon className="w-4 h-4 text-gray-600"/>
                             <span className="text-gray-700">중심: {safeZone.center.lat.toFixed(3)}, {safeZone.center.lng.toFixed(3)}</span>
                         </div>
                     </div>
