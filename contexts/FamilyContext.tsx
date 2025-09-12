@@ -56,21 +56,32 @@ export const FamilyProvider: React.FC<FamilyProviderProps> = ({ children }) => {
     setError(null);
     
     try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) return;
-
-      const response = await getFamilies(token);
-      if (response.success && response.data) {
-        setFamilies(response.data);
+      // Family API는 403 오류가 발생하므로 로컬 데이터만 사용
+      console.log('ℹ️ Family API는 현재 사용할 수 없음, 로컬 데이터 사용');
+      loadFamiliesFromStorage();
+      
+      // 기본 가족이 없으면 자동 생성
+      if (families.length === 0) {
+        const defaultFamily: Family = {
+          id: `family_${Date.now()}`,
+          name: `${user.name}의 가족`,
+          members: [{
+            id: `member_${Date.now()}`,
+            userId: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isActive: true,
+            joinedAt: new Date().toISOString()
+          }],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
         
-        // 현재 가족이 없으면 첫 번째 가족을 선택
-        if (!currentFamily && response.data.length > 0) {
-          setCurrentFamily(response.data[0]);
-        }
-      } else {
-        console.log('가족 목록을 가져올 수 없음, 로컬 스토리지 사용');
-        // 로컬 스토리지에서 가족 정보 로드
-        loadFamiliesFromStorage();
+        setFamilies([defaultFamily]);
+        setCurrentFamily(defaultFamily);
+        saveFamiliesToStorage([defaultFamily]);
+        console.log('✅ 기본 가족 생성됨:', defaultFamily.name);
       }
     } catch (error) {
       console.error('가족 목록 로드 오류:', error);

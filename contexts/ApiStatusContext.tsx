@@ -61,16 +61,39 @@ export const ApiStatusProvider: React.FC<ApiStatusProviderProps> = ({ children }
 
   const checkAllEndpoints = async () => {
     setIsLoading(true);
-    const endpointsToCheck = [
+    
+    // 실제 작동하는 API들만 체크
+    const workingEndpoints = [
       { name: 'memories', endpoint: '/memories' },
-      { name: 'medications', endpoint: '/medications' },
-      { name: 'users', endpoint: '/users/me' },
-      { name: 'connection', endpoint: '/users/connection/status' }
+      { name: 'medications', endpoint: '/medications' }
     ];
 
+    // 작동하지 않는 API들은 로컬 데이터 사용으로 표시
+    const localEndpoints = [
+      { name: 'users', endpoint: '/users/me' },
+      { name: 'connection', endpoint: '/users/connection/status' },
+      { name: 'families', endpoint: '/families' }
+    ];
+
+    // 작동하는 API들 체크
     await Promise.all(
-      endpointsToCheck.map(({ name, endpoint }) => checkEndpoint(name, endpoint))
+      workingEndpoints.map(({ name, endpoint }) => checkEndpoint(name, endpoint))
     );
+
+    // 작동하지 않는 API들은 로컬 사용으로 표시
+    localEndpoints.forEach(({ name, endpoint }) => {
+      setEndpoints(prev => ({
+        ...prev,
+        [name]: {
+          name,
+          endpoint,
+          isConnected: false,
+          lastChecked: new Date(),
+          error: '로컬 데이터 사용'
+        }
+      }));
+    });
+
     setIsLoading(false);
   };
 

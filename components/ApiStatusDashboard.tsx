@@ -36,7 +36,8 @@ const ApiStatusDashboard: React.FC = () => {
     memories: '메모리 API',
     medications: '약물 관리 API',
     users: '사용자 정보 API',
-    connection: '연결 상태 API'
+    connection: '연결 상태 API',
+    families: '가족 관리 API'
   };
 
   return (

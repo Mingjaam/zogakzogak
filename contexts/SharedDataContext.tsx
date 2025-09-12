@@ -127,31 +127,51 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
   const checkConnectionAndSync = async () => {
     setIsLoading(true);
     try {
-      // 실제 API에서 데이터 가져오기
+      // 실제 API에서 데이터 가져오기 (작동하는 API만)
       const token = localStorage.getItem('auth_token');
       if (token) {
-        const response = await syncSharedData(token);
-        if (response.success && response.data) {
-          // API에서 가져온 데이터로 업데이트
-          if (response.data.memories && response.data.memories.length > 0) {
-            setSharedMemories(response.data.memories);
-            console.log('✅ API에서 메모리 데이터 로드됨:', response.data.memories.length, '개');
+        console.log('🔄 API에서 데이터 동기화 시작...');
+        
+        // memories API 테스트 (작동함)
+        try {
+          const memoriesResponse = await apiRequest<any[]>('/memories', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (memoriesResponse.success && memoriesResponse.data) {
+            setSharedMemories(memoriesResponse.data);
+            console.log('✅ API에서 메모리 데이터 로드됨:', memoriesResponse.data.length, '개');
+          } else {
+            console.log('⚠️ 메모리 API 응답 없음, 로컬 데이터 사용');
           }
-          if (response.data.medications && response.data.medications.length > 0) {
-            setSharedMedications(response.data.medications);
-            console.log('✅ API에서 약물 데이터 로드됨:', response.data.medications.length, '개');
-          }
-          if (response.data.locations && response.data.locations.length > 0) {
-            setSharedLocations(response.data.locations);
-            console.log('✅ API에서 위치 데이터 로드됨:', response.data.locations.length, '개');
-          }
-          if (response.data.notifications && response.data.notifications.length > 0) {
-            setSharedNotifications(response.data.notifications);
-            console.log('✅ API에서 알림 데이터 로드됨:', response.data.notifications.length, '개');
-          }
-        } else {
-          console.log('⚠️ API에서 데이터를 가져올 수 없음, 로컬 스토리지 사용');
+        } catch (error) {
+          console.log('⚠️ 메모리 API 오류, 로컬 데이터 사용:', error);
         }
+
+        // medications API 테스트 (작동함)
+        try {
+          const medicationsResponse = await apiRequest<any[]>('/medications', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (medicationsResponse.success && medicationsResponse.data) {
+            setSharedMedications(medicationsResponse.data);
+            console.log('✅ API에서 약물 데이터 로드됨:', medicationsResponse.data.length, '개');
+          } else {
+            console.log('⚠️ 약물 API 응답 없음, 로컬 데이터 사용');
+          }
+        } catch (error) {
+          console.log('⚠️ 약물 API 오류, 로컬 데이터 사용:', error);
+        }
+
+        // locations와 notifications는 API가 없으므로 로컬 데이터만 사용
+        console.log('ℹ️ 위치 및 알림 데이터는 로컬에서만 관리');
       }
       
       // 로컬 스토리지에서도 데이터 로드 (백업)
