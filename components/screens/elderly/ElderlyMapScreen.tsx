@@ -1,6 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { Memory, dummyMemories } from '../../../types/memory';
+import { useSharedData } from '../../../contexts/SharedDataContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // Google Maps 타입 정의
 declare global {
@@ -166,6 +168,8 @@ const ElderlyMapScreen: React.FC = () => {
     // 로컬 스토리지에서 추억 로드
     const [userMemories, setUserMemories] = useState<any[]>([]);
     const [allMemories, setAllMemories] = useState<Memory[]>([]);
+    const { updateLocation } = useSharedData();
+    const { user } = useAuth();
     
     // 모든 추억 (더미 + 사용자) 결합
     React.useEffect(() => {
@@ -176,6 +180,42 @@ const ElderlyMapScreen: React.FC = () => {
         const combinedMemories = [...loadedMemories, ...dummyMemories];
         setAllMemories(combinedMemories);
     }, []);
+
+    // 현재 위치를 실시간으로 공유
+    useEffect(() => {
+        if (navigator.geolocation) {
+            const watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    
+                    // 주소 변환 (간단한 예시)
+                    const address = `위도: ${latitude.toFixed(6)}, 경도: ${longitude.toFixed(6)}`;
+                    
+                    // 공유 위치 업데이트
+                    updateLocation({
+                        userId: user?.id || '',
+                        userName: user?.name || '어르신',
+                        latitude,
+                        longitude,
+                        address,
+                        isActive: true
+                    });
+                },
+                (error) => {
+                    console.error('위치 정보 오류:', error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 30000 // 30초마다 업데이트
+                }
+            );
+
+            return () => {
+                navigator.geolocation.clearWatch(watchId);
+            };
+        }
+    }, [updateLocation, user]);
     
     // 첫 번째 기억을 기본으로 선택
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories[0] || null);

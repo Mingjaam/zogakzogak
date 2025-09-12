@@ -169,7 +169,7 @@ GET  /api/users/me        # 사용자 정보 조회
 API 연결은 앱 내에서 직접 테스트할 수 있습니다. 회원가입 및 로그인 기능을 통해 API 연동을 확인하세요.
 
 ### 환경 설정
-- **API Base URL**: `http://54.180.125.150:8080/api`
+- **API Base URL**: `https://zogakzogak.ddns.net/api`
 - **인증 방식**: Bearer Token
 - **데이터 형식**: JSON
 

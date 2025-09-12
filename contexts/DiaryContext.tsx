@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { EmotionType, EmotionScores } from '../lib/gemini';
+import { useSharedData } from './SharedDataContext';
 
 export interface DiaryEntry {
   id: string;
@@ -62,6 +63,7 @@ const saveDiariesToStorage = (diaries: DiaryEntry[]) => {
 
 export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+  const { addSharedMemory } = useSharedData();
 
   // 컴포넌트 마운트 시 로컬 스토리지에서 데이터 로드
   useEffect(() => {
@@ -93,6 +95,28 @@ export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
       
       return updated;
     });
+
+    // 자동으로 공유 메모리에 추가
+    try {
+      addSharedMemory({
+        title: `일기 - ${newDiary.date}`,
+        description: newDiary.content,
+        imageUrl: '', // 일기는 이미지가 없으므로 빈 문자열
+        location: {
+          name: '집',
+          lat: 0,
+          lng: 0
+        },
+        date: newDiary.date,
+        people: [diary.author === 'elderly' ? '어르신' : '보호자'],
+        tags: ['일기', '감정기록'],
+        createdBy: diary.author === 'elderly' ? 'SENIOR' : 'GUARDIAN',
+        createdByName: diary.author === 'elderly' ? '어르신' : '보호자'
+      });
+      console.log("✅ Diary automatically shared as memory");
+    } catch (error) {
+      console.error("❌ Error sharing diary as memory:", error);
+    }
   };
 
   const updateDiary = (id: string, updates: Partial<DiaryEntry>) => {

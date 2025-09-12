@@ -3,6 +3,7 @@ import { EmotionType, EmotionScores } from '../../../lib/gemini';
 import EmotionCharacter from '../../icons/EmotionCharacter';
 import EmotionChart from '../../EmotionChart';
 import { useDiary } from '../../../contexts/DiaryContext';
+import { useSharedData } from '../../../contexts/SharedDataContext';
 
 interface DiaryScreenProps {
   // Props can be added later if needed
@@ -10,11 +11,29 @@ interface DiaryScreenProps {
 
 const DiaryScreen: React.FC<DiaryScreenProps> = () => {
   const { diaries, deleteDiary } = useDiary();
+  const { sharedMemories } = useSharedData();
   const [selectedEntry, setSelectedEntry] = useState<typeof diaries[0] | null>(null);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   
-  // 어르신이 작성한 일기만 필터링 (최신순)
-  const diaryEntries = diaries.filter(diary => diary.author === 'elderly').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // 어르신이 작성한 일기와 공유 메모리 통합 (최신순)
+  const allEntries = [
+    ...diaries.filter(diary => diary.author === 'elderly').map(diary => ({
+      ...diary,
+      type: 'diary' as const,
+      createdBy: 'SENIOR' as const,
+      createdByName: '어르신',
+      sharedAt: diary.date
+    })),
+    ...sharedMemories.map(memory => ({
+      ...memory,
+      type: 'memory' as const,
+      author: memory.createdBy === 'SENIOR' ? 'elderly' : 'guardian',
+      date: memory.sharedAt,
+      emotionScores: { joy: 0.5, happiness: 0.3, surprise: 0.1, sadness: 0.05, anger: 0.03, fear: 0.02 } as EmotionScores
+    }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const diaryEntries = allEntries;
   
   // 오늘의 기분 계산 (가장 최근 일기의 가장 높은 점수 감정)
   const getTodayEmotion = (): EmotionType => {
@@ -88,7 +107,9 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
               <EmotionCharacter emotion={selectedEntry.emotion} size="lg" />
               <div>
                 <h3 className="text-lg font-bold text-gray-800">{selectedEntry.date}</h3>
-                <p className="text-sm text-gray-600">어르신의 기분</p>
+                <p className="text-sm text-gray-600">
+                  {selectedEntry.type === 'diary' ? '어르신의 일기' : `${selectedEntry.createdByName}의 추억`}
+                </p>
               </div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
@@ -124,10 +145,22 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
                 >
                   <EmotionCharacter emotion={entry.emotion} size="sm" />
                   <div className="flex-1">
-                    <p className="font-medium text-gray-800">{entry.date}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-medium text-gray-800">{entry.date}</p>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        entry.type === 'diary' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {entry.type === 'diary' ? '일기' : '추억'}
+                      </span>
+                    </div>
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {expandedEntry === entry.id ? entry.content : 
                        entry.content.length > 50 ? `${entry.content.substring(0, 50)}...` : entry.content}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {entry.type === 'diary' ? '어르신이 작성' : `${entry.createdByName}이 추가`}
                     </p>
                     {entry.content.length > 50 && (
                       <button

@@ -3,6 +3,7 @@ import { analyzeEmotionScores, EmotionType, EmotionScores } from '../../../lib/g
 import EmotionCharacter from '../../icons/EmotionCharacter';
 import EmotionChart from '../../EmotionChart';
 import { useDiary } from '../../../contexts/DiaryContext';
+import { useSharedData } from '../../../contexts/SharedDataContext';
 
 interface ElderlyDiaryScreenProps {
   // Props can be added later if needed
@@ -10,14 +11,32 @@ interface ElderlyDiaryScreenProps {
 
 const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
   const { diaries, addDiary, deleteDiary } = useDiary();
+  const { sharedMemories, addSharedMemory } = useSharedData();
   const [diaryContent, setDiaryContent] = useState('');
   const [isWriting, setIsWriting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<{emotion: EmotionType, scores: EmotionScores} | null>(null);
   
-  // 어르신이 작성한 일기만 필터링 (최신순)
-  const recentDiaries = diaries.filter(diary => diary.author === 'elderly').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // 어르신이 작성한 일기와 공유 메모리 통합 (최신순)
+  const allEntries = [
+    ...diaries.filter(diary => diary.author === 'elderly').map(diary => ({
+      ...diary,
+      type: 'diary' as const,
+      createdBy: 'SENIOR' as const,
+      createdByName: '어르신',
+      sharedAt: diary.date
+    })),
+    ...sharedMemories.map(memory => ({
+      ...memory,
+      type: 'memory' as const,
+      author: memory.createdBy === 'SENIOR' ? 'elderly' : 'guardian',
+      date: memory.sharedAt,
+      emotionScores: { joy: 0.5, happiness: 0.3, surprise: 0.1, sadness: 0.05, anger: 0.03, fear: 0.02 } as EmotionScores
+    }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const recentDiaries = allEntries;
   
   // 오늘의 기분 계산 (가장 최근 일기의 가장 높은 점수 감정)
   const getTodayEmotion = (): EmotionType => {
@@ -85,6 +104,24 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
       try {
         // 일기 목록에 추가
         addDiary(newDiary);
+        
+        // 공유 메모리에도 추가
+        addSharedMemory({
+          title: `일기 - ${newDiary.date}`,
+          description: newDiary.content,
+          imageUrl: '', // 일기는 이미지가 없으므로 빈 문자열
+          location: {
+            name: '집',
+            lat: 0,
+            lng: 0
+          },
+          date: newDiary.date,
+          people: ['어르신'],
+          tags: ['일기', '감정기록'],
+          createdBy: 'SENIOR',
+          createdByName: '어르신'
+        });
+        
         console.log("✅ Diary saved successfully!");
         
         alert('일기가 저장되었습니다!');

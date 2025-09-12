@@ -1,8 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { Memory, dummyMemories } from '../../../types/memory';
 import SafeZoneModal from '../../modals/SafeZoneModal';
 import { useSafeZone } from '../../../contexts/SafeZoneContext';
+import { useSharedData } from '../../../contexts/SharedDataContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import LocationPinIcon from '../../icons/LocationPinIcon';
 import RocketIcon from '../../icons/RocketIcon';
 import ClockIcon from '../../icons/ClockIcon';
@@ -16,7 +18,22 @@ const MapScreen: React.FC = () => {
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
     const [isSafeZoneModalOpen, setIsSafeZoneModalOpen] = useState(false);
     const { safeZone, updateSafeZone } = useSafeZone();
+    const { sharedLocations, updateLocation } = useSharedData();
+    const { user } = useAuth();
     const mapRef = useRef<google.maps.Map | null>(null);
+    const [elderlyLocation, setElderlyLocation] = useState<{lat: number, lng: number, address: string} | null>(null);
+
+    // 어르신 위치 정보 업데이트
+    useEffect(() => {
+        const elderlyLocationData = sharedLocations.find(loc => loc.isActive);
+        if (elderlyLocationData) {
+            setElderlyLocation({
+                lat: elderlyLocationData.latitude,
+                lng: elderlyLocationData.longitude,
+                address: elderlyLocationData.address
+            });
+        }
+    }, [sharedLocations]);
 
     const handleMemoryClick = (memory: Memory) => {
         setSelectedMemory(memory);

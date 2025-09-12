@@ -1,7 +1,7 @@
 // API 기본 설정 및 유틸리티 함수들
 
-// 개발 환경에서는 직접 API 서버 사용 (프록시 문제로 인해)
-const API_BASE_URL = 'http://54.180.125.150:8080/api';
+// HTTPS API 서버 사용
+const API_BASE_URL = 'https://zogakzogak.ddns.net/api';
 
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
@@ -150,6 +150,160 @@ export async function getUserInfo(token: string): Promise<ApiResponse<User>> {
       'Authorization': `Bearer ${token}`,
     },
   });
+}
+
+// 연결 상태 확인 API
+export async function checkConnectionStatus(token: string): Promise<ApiResponse<{ isConnected: boolean; connectedUser?: User }>> {
+  return apiRequest<{ isConnected: boolean; connectedUser?: User }>('/users/connection/status', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+}
+
+// 이메일로 연결 요청 보내기 API
+export async function sendConnectionRequest(token: string, email: string): Promise<ApiResponse<{ message: string }>> {
+  return apiRequest<{ message: string }>('/users/connection/request', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ email }),
+  });
+}
+
+// 연결 요청 수락 API
+export async function acceptConnectionRequest(token: string, requestId: string): Promise<ApiResponse<{ message: string }>> {
+  return apiRequest<{ message: string }>('/users/connection/accept', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ requestId }),
+  });
+}
+
+// 연결 요청 목록 조회 API
+export async function getConnectionRequests(token: string): Promise<ApiResponse<{ requests: ConnectionRequest[] }>> {
+  return apiRequest<{ requests: ConnectionRequest[] }>('/users/connection/requests', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+}
+
+// 연결 요청 타입 정의
+export interface ConnectionRequest {
+  id: string;
+  fromUser: User;
+  toUser: User;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+}
+
+// 공유 데이터 동기화 API
+export async function syncSharedData(token: string): Promise<ApiResponse<{
+  memories: any[];
+  locations: any[];
+  medications: any[];
+  notifications: any[];
+}>> {
+  try {
+    // 실제 API 엔드포인트들을 사용
+    const [memoriesRes, medicationsRes] = await Promise.all([
+      apiRequest<any[]>('/memories', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }),
+      apiRequest<any[]>('/medications', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+    ]);
+
+    return {
+      success: true,
+      data: {
+        memories: memoriesRes.success ? memoriesRes.data || [] : [],
+        locations: [], // 위치 API는 아직 구현되지 않음
+        medications: medicationsRes.success ? medicationsRes.data || [] : [],
+        notifications: [] // 알림 API는 아직 구현되지 않음
+      }
+    };
+  } catch (error) {
+    console.error('데이터 동기화 오류:', error);
+    return {
+      success: false,
+      error: '데이터 동기화 중 오류가 발생했습니다.'
+    };
+  }
+}
+
+// 공유 메모리 동기화 API
+export async function syncSharedMemories(token: string, memories: any[]): Promise<ApiResponse<{ message: string }>> {
+  try {
+    // 실제 메모리 API 사용
+    const response = await apiRequest<any>('/memories', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(memories[0]), // 첫 번째 메모리만 전송
+    });
+    
+    return {
+      success: response.success,
+      data: { message: '메모리가 동기화되었습니다.' }
+    };
+  } catch (error) {
+    console.error('메모리 동기화 오류:', error);
+    return {
+      success: false,
+      error: '메모리 동기화 중 오류가 발생했습니다.'
+    };
+  }
+}
+
+// 공유 위치 동기화 API
+export async function syncSharedLocations(token: string, locations: any[]): Promise<ApiResponse<{ message: string }>> {
+  return apiRequest<{ message: string }>('/users/shared-data/locations', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ locations }),
+  });
+}
+
+// 공유 약물 동기화 API
+export async function syncSharedMedications(token: string, medications: any[]): Promise<ApiResponse<{ message: string }>> {
+  try {
+    // 실제 약물 API 사용
+    const response = await apiRequest<any>('/medications', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(medications[0]), // 첫 번째 약물만 전송
+    });
+    
+    return {
+      success: response.success,
+      data: { message: '약물이 동기화되었습니다.' }
+    };
+  } catch (error) {
+    console.error('약물 동기화 오류:', error);
+    return {
+      success: false,
+      error: '약물 동기화 중 오류가 발생했습니다.'
+    };
+  }
 }
 
 // 토큰 저장/조회/삭제 유틸리티

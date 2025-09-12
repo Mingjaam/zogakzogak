@@ -21,9 +21,9 @@ export default defineConfig(({ mode }) => {
       server: {
         proxy: {
           '/api': {
-            target: 'http://54.180.125.150:8080',
+            target: 'https://zogakzogak.ddns.net',
             changeOrigin: true,
-            secure: false,
+            secure: true,
             rewrite: (path) => path.replace(/^\/api/, '/api')
           }
         }
