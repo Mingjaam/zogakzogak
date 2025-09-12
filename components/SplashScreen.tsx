@@ -19,7 +19,7 @@ const SplashScreen: React.FC = () => {
         // 사운드 파일 재생
         const playStartupSound = async () => {
             try {
-                const audio = new Audio('/sounds/startup.mp3');
+                const audio = new Audio(`${import.meta.env.BASE_URL}sounds/startup.mp3`);
                 audio.volume = 0.5; // 볼륨을 50%로 설정
                 audioRef.current = audio;
                 

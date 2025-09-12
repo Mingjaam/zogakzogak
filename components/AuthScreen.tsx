@@ -85,7 +85,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
 
     const playStartupSound = () => {
         try {
-            const audio = new Audio('/sounds/startup.mp3');
+            const audio = new Audio(`${import.meta.env.BASE_URL}sounds/startup.mp3`);
             audio.play().catch(error => {
                 console.log('사운드 재생 실패:', error);
             });
