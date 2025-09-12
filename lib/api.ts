@@ -50,7 +50,12 @@ const createHeaders = (): HeadersInit => ({
 
 // 환경에 따른 API URL 결정
 function getApiUrl(endpoint: string): string {
-  // 모든 환경에서 직접 API 호출 시도 (백엔드 CORS 설정 필요)
+  const isProduction = window.location.hostname === 'mingjaam.github.io';
+  if (isProduction) {
+    // 프로덕션에서는 CORS 프록시 사용 (백엔드 CORS 설정 완료 전까지)
+    return `${CORS_PROXY}${encodeURIComponent(API_BASE_URL + endpoint)}`;
+  }
+  // 개발 환경에서는 직접 API 호출 (Vite 프록시 사용)
   return `${API_BASE_URL}${endpoint}`;
 }
 
