@@ -9,6 +9,7 @@ import PillIcon from '../../icons/PillIcon';
 import CheckIcon from '../../icons/CheckIcon';
 import WarningIcon from '../../icons/WarningIcon';
 import EmotionCharacter from '../../icons/EmotionCharacter';
+import ApiStatusDashboard from '../../ApiStatusDashboard';
 
 // Google Maps 타입 정의
 declare global {
@@ -168,6 +169,8 @@ const HomeScreen: React.FC = () => {
     
     return (
         <div className="p-4 space-y-6">
+            {/* API 상태 대시보드 */}
+            <ApiStatusDashboard />
             {/* User Status Card */}
             <div className="bg-white p-5 rounded-3xl shadow-md">
                 <div className="flex justify-between items-start">

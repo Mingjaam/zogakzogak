@@ -9,6 +9,7 @@ import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SharedDataProvider, useSharedData } from './contexts/SharedDataContext';
+import { ApiStatusProvider } from './contexts/ApiStatusContext';
 
 const AppContent: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -105,9 +106,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <AuthProvider>
-            <SharedDataProvider>
-                <AppContent />
-            </SharedDataProvider>
+            <ApiStatusProvider>
+                <SharedDataProvider>
+                    <AppContent />
+                </SharedDataProvider>
+            </ApiStatusProvider>
         </AuthProvider>
     );
 };

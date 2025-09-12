@@ -7,6 +7,7 @@ import ElderlyDiaryScreen from './components/screens/elderly/ElderlyDiaryScreen'
 import ElderlyProfileScreen from './components/screens/elderly/ElderlyProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
+import ApiStatusDashboard from './components/ApiStatusDashboard';
 import MedicationReminderModal from './components/modals/MedicationReminderModal';
 
 export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';

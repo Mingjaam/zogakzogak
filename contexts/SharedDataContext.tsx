@@ -132,10 +132,25 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
       if (token) {
         const response = await syncSharedData(token);
         if (response.success && response.data) {
-          setSharedMemories(response.data.memories || []);
-          setSharedLocations(response.data.locations || []);
-          setSharedMedications(response.data.medications || []);
-          setSharedNotifications(response.data.notifications || []);
+          // API에서 가져온 데이터로 업데이트
+          if (response.data.memories && response.data.memories.length > 0) {
+            setSharedMemories(response.data.memories);
+            console.log('✅ API에서 메모리 데이터 로드됨:', response.data.memories.length, '개');
+          }
+          if (response.data.medications && response.data.medications.length > 0) {
+            setSharedMedications(response.data.medications);
+            console.log('✅ API에서 약물 데이터 로드됨:', response.data.medications.length, '개');
+          }
+          if (response.data.locations && response.data.locations.length > 0) {
+            setSharedLocations(response.data.locations);
+            console.log('✅ API에서 위치 데이터 로드됨:', response.data.locations.length, '개');
+          }
+          if (response.data.notifications && response.data.notifications.length > 0) {
+            setSharedNotifications(response.data.notifications);
+            console.log('✅ API에서 알림 데이터 로드됨:', response.data.notifications.length, '개');
+          }
+        } else {
+          console.log('⚠️ API에서 데이터를 가져올 수 없음, 로컬 스토리지 사용');
         }
       }
       
