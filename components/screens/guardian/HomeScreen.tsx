@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { useSafeZone } from '../../../contexts/SafeZoneContext';
+import { useDiary } from '../../../contexts/DiaryContext';
+import { EmotionType } from '../../../lib/gemini';
 import PhoneIcon from '../../icons/PhoneIcon';
 import LocationPinIcon from '../../icons/LocationPinIcon';
 import PillIcon from '../../icons/PillIcon';
 import CheckIcon from '../../icons/CheckIcon';
 import WarningIcon from '../../icons/WarningIcon';
+import EmotionCharacter from '../../icons/EmotionCharacter';
 
 // Google Maps 타입 정의
 declare global {
@@ -40,6 +43,28 @@ const HomeScreen: React.FC = () => {
     
     // SafeZoneContext에서 안전구역 정보 가져오기
     const { safeZone } = useSafeZone();
+    
+    // DiaryContext에서 일기 정보 가져오기
+    const { diaries } = useDiary();
+    
+    // 어르신이 작성한 일기만 필터링 (최신순)
+    const elderlyDiaries = diaries.filter(diary => diary.author === 'elderly').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    // 오늘의 기분 계산 (가장 최근 일기의 가장 높은 점수 감정)
+    const getTodayEmotion = (): EmotionType => {
+        if (elderlyDiaries.length === 0) return 'joy';
+        
+        const todayDiary = elderlyDiaries[0]; // 가장 최근 일기
+        const scores = todayDiary.emotionScores;
+        
+        // 가장 높은 점수의 감정 찾기
+        const emotions: EmotionType[] = ['joy', 'happiness', 'surprise', 'sadness', 'anger', 'fear'];
+        return emotions.reduce((prev, current) => 
+            scores[current] > scores[prev] ? current : prev
+        );
+    };
+    
+    const todayEmotion = getTodayEmotion();
     const [elderlyLocation] = useState({ lat: 35.8720, lng: 128.6020 }); // 어르신 현재 위치
     const [isInSafeZone, setIsInSafeZone] = useState(true);
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -189,6 +214,44 @@ const HomeScreen: React.FC = () => {
                            <CheckIcon className="w-5 h-5 text-green-500 bg-white rounded-full p-0.5" />
                            <CheckIcon className="w-5 h-5 text-green-500 bg-white rounded-full p-0.5" />
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 오늘의 기분 섹션 */}
+            <div className="bg-white p-5 rounded-3xl shadow-md">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-gray-800">오늘의 기분</h2>
+                    <div className="text-sm text-gray-500">
+                        {elderlyDiaries.length > 0 ? elderlyDiaries[0].date : '일기 없음'}
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                        <EmotionCharacter emotion={todayEmotion} size="lg" />
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-2xl font-bold text-gray-800">
+                                {todayEmotion === 'joy' ? '기뻐요' : 
+                                 todayEmotion === 'happiness' ? '행복함' :
+                                 todayEmotion === 'surprise' ? '놀라움' :
+                                 todayEmotion === 'sadness' ? '슬퍼요' :
+                                 todayEmotion === 'anger' ? '화나요' : '두려워요'}
+                            </span>
+                            {elderlyDiaries.length > 0 && (
+                                <span className="text-sm text-gray-500">
+                                    ({elderlyDiaries[0].emotionScores[todayEmotion]}%)
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-sm text-gray-600">
+                            {elderlyDiaries.length > 0 
+                                ? 'AI가 분석한 어르신의 감정 상태입니다'
+                                : '아직 작성된 일기가 없습니다'
+                            }
+                        </p>
                     </div>
                 </div>
             </div>
