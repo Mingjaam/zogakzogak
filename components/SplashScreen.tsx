@@ -5,6 +5,16 @@ const SplashScreen: React.FC = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [isAudioEnabled, setIsAudioEnabled] = useState(false);
 
+    // 사용자 상호작용 후 사운드 재생을 위한 함수
+    const enableAudio = () => {
+        if (!isAudioEnabled && audioRef.current) {
+            audioRef.current.play().catch(error => {
+                console.log('사운드 재생 실패:', error);
+            });
+            setIsAudioEnabled(true);
+        }
+    };
+
     useEffect(() => {
         // 사운드 파일 재생
         const playStartupSound = async () => {
@@ -23,16 +33,6 @@ const SplashScreen: React.FC = () => {
                 } else if (error.name !== 'AbortError') {
                     console.log('사운드 재생 실패:', error);
                 }
-            }
-        };
-
-        // 사용자 상호작용 후 사운드 재생을 위한 이벤트 리스너
-        const enableAudio = () => {
-            if (!isAudioEnabled && audioRef.current) {
-                audioRef.current.play().catch(error => {
-                    console.log('사운드 재생 실패:', error);
-                });
-                setIsAudioEnabled(true);
             }
         };
 
@@ -68,11 +68,17 @@ const SplashScreen: React.FC = () => {
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <h1 className="text-5xl font-extrabold tracking-wider">조각조각</h1>
+                    <h1 
+                        className="text-5xl font-extrabold tracking-wider cursor-pointer hover:scale-105 transition-transform duration-200 select-none"
+                        onClick={enableAudio}
+                        title="클릭하면 사운드가 재생됩니다"
+                    >
+                        조각조각
+                    </h1>
                     <p className="text-lg font-medium opacity-90">소중한 순간을 담는 추억기록 APP</p>
                     {!isAudioEnabled && (
                         <p className="text-sm opacity-75 mt-2">
-                            🔊 사운드를 재생하려면 화면을 터치하세요
+                            🔊 "조각조각"을 클릭하면 사운드가 재생됩니다
                         </p>
                     )}
                 </div>
