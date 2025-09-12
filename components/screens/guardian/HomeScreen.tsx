@@ -39,7 +39,6 @@ declare global {
 }
 
 const HomeScreen: React.FC = () => {
-    const photoUrl = "https://i.imgur.com/k2m3s4f.png"; // Placeholder image from design
     
     // SafeZoneContext에서 안전구역 정보 가져오기
     const { safeZone } = useSafeZone();
@@ -301,19 +300,6 @@ const HomeScreen: React.FC = () => {
                 </div>
             </div>
 
-            {/* Photo Gallery Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-xl border border-gray-100 text-center">
-                <div className="w-full h-56 rounded-2xl overflow-hidden mb-4">
-                    <img src={photoUrl} alt="Family gathering" className="w-full h-full object-cover" />
-                </div>
-                <h3 className="font-bold text-lg text-gray-800">사랑하는 가족들과 함께한 시간</h3>
-                <p className="text-gray-500">대구 월성동 2024.05.05</p>
-                <div className="flex justify-center gap-2 mt-4">
-                    <span className="block w-2.5 h-2.5 bg-gray-600 rounded-full"></span>
-                    <span className="block w-2.5 h-2.5 bg-gray-300 rounded-full"></span>
-                    <span className="block w-2.5 h-2.5 bg-gray-300 rounded-full"></span>
-                </div>
-            </div>
         </div>
     );
 };
