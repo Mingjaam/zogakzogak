@@ -38,19 +38,19 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, setActiveTab }) 
     return (
         <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center z-20">
             <NavItem tabName="home" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <HomeIcon className="w-7 h-7" />
+                <HomeIcon className="w-7 h-7" isActive={activeTab === 'home'} />
             </NavItem>
             <NavItem tabName="gallery" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <GalleryIcon className="w-7 h-7" />
+                <GalleryIcon className="w-7 h-7" isActive={activeTab === 'gallery'} />
             </NavItem>
             <NavItem tabName="map" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <MapIcon className="w-7 h-7" />
+                <MapIcon className="w-7 h-7" isActive={activeTab === 'map'} />
             </NavItem>
             <NavItem tabName="diary" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <DiaryIcon className="w-7 h-7" />
+                <DiaryIcon className="w-7 h-7" isActive={activeTab === 'diary'} />
             </NavItem>
             <NavItem tabName="profile" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <UserIcon className="w-7 h-7" />
+                <UserIcon className="w-7 h-7" isActive={activeTab === 'profile'} />
             </NavItem>
         </nav>
     );
