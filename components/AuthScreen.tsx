@@ -83,13 +83,29 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
         }));
     };
 
+    const playStartupSound = () => {
+        try {
+            const audio = new Audio('/sounds/startup.mp3');
+            audio.play().catch(error => {
+                console.log('사운드 재생 실패:', error);
+            });
+        } catch (error) {
+            console.log('사운드 재생 오류:', error);
+        }
+    };
+
     return (
         <main className="bg-white min-h-screen w-screen flex flex-col items-center justify-center p-4 antialiased">
             <div className="w-full max-w-sm mx-auto">
                 {isLoginMode ? (
                     <>
                         <div className="flex flex-col items-center text-center mb-8">
-                            <img src="http://imgur.com/O0Z5u8g.png" alt="조각조각 로고" className="w-45 h-40" />
+                            <img 
+                                src="http://imgur.com/O0Z5u8g.png" 
+                                alt="조각조각 로고" 
+                                className="w-45 h-40 cursor-pointer hover:scale-105 transition-transform select-none" 
+                                onClick={playStartupSound}
+                            />
                             <h1 className="text-4xl font-extrabold text-[#3e8e5a] mt-4">조각조각</h1>
                             <p className="text-md text-[#6a9f7e] mt-1">소중한 순간을 담는 추억기록 APP</p>
                         </div>
