@@ -9,7 +9,7 @@ interface DiaryScreenProps {
 }
 
 const DiaryScreen: React.FC<DiaryScreenProps> = () => {
-  const { diaries } = useDiary();
+  const { diaries, deleteDiary } = useDiary();
   const [selectedEntry, setSelectedEntry] = useState<typeof diaries[0] | null>(null);
   
   // 어르신이 작성한 일기만 필터링 (최신순)
@@ -37,6 +37,18 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
       setSelectedEntry(diaryEntries[0]);
     }
   }, [diaryEntries, selectedEntry]);
+
+  const handleDeleteDiary = (diaryId: string) => {
+    if (window.confirm('정말로 이 일기를 삭제하시겠습니까?')) {
+      deleteDiary(diaryId);
+      console.log('일기가 삭제되었습니다:', diaryId);
+      
+      // 삭제된 일기가 현재 선택된 일기라면 선택 해제
+      if (selectedEntry?.id === diaryId) {
+        setSelectedEntry(null);
+      }
+    }
+  };
 
   return (
     <div className="p-4">
@@ -107,9 +119,8 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
         <h3 className="text-lg font-semibold text-gray-700 mb-3">최근 일기</h3>
         <div className="space-y-3">
           {diaryEntries.map((entry) => (
-            <button
+            <div
               key={entry.id}
-              onClick={() => setSelectedEntry(entry)}
               className={`w-full p-4 rounded-2xl shadow-lg border transition-all ${
                 selectedEntry?.id === entry.id 
                   ? 'bg-white border-green-200 ring-2 ring-green-100' 
@@ -117,19 +128,36 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedEntry(entry)}
+                  className="flex items-center gap-3 flex-1 text-left"
+                >
                   <EmotionCharacter emotion={entry.emotion} size="sm" />
-                  <div className="text-left">
+                  <div className="flex-1">
                     <p className="font-medium text-gray-800">{entry.date}</p>
                     <p className="text-sm text-gray-600 truncate max-w-48">{entry.content}</p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-500">감정 분석</div>
-                  <div className="text-xs text-gray-400">자세히 보기</div>
+                </button>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500">감정 분석</div>
+                    <div className="text-xs text-gray-400">자세히 보기</div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteDiary(entry.id);
+                    }}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="일기 삭제"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-            </button>
+            </div>
           ))}
         </div>
       </div>
