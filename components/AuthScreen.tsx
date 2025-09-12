@@ -179,29 +179,29 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                 
                                 <div className="space-y-3">
                                     <p className="text-sm font-medium text-gray-700">역할 선택</p>
-                                    <div className="flex gap-4">
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="SENIOR"
-                                                checked={registerData.role === 'SENIOR'}
-                                                onChange={(e) => handleInputChange('role', e.target.value as 'SENIOR' | 'GUARDIAN')}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-sm">어르신</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="role"
-                                                value="GUARDIAN"
-                                                checked={registerData.role === 'GUARDIAN'}
-                                                onChange={(e) => handleInputChange('role', e.target.value as 'SENIOR' | 'GUARDIAN')}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-sm">보호자</span>
-                                        </label>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleInputChange('role', 'SENIOR')}
+                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 ${
+                                                registerData.role === 'SENIOR'
+                                                    ? 'bg-[#70c18c] text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            어르신
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleInputChange('role', 'GUARDIAN')}
+                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 ${
+                                                registerData.role === 'GUARDIAN'
+                                                    ? 'bg-[#70c18c] text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            보호자
+                                        </button>
                                     </div>
                                 </div>
 
