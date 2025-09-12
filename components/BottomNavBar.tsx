@@ -2,11 +2,11 @@ import React from 'react';
 import HomeIcon from './icons/HomeIcon';
 import GalleryIcon from './icons/GalleryIcon';
 import MapIcon from './icons/MapIcon';
-import BellIcon from './icons/BellIcon';
+import DiaryIcon from './icons/DiaryIcon';
 import UserIcon from './icons/UserIcon';
 
 // Make TabName generic to be used by both Guardian and Elderly apps
-type TabName = 'home' | 'gallery' | 'map' | 'notifications' | 'profile';
+type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
 interface BottomNavBarProps {
     activeTab: TabName;
@@ -46,8 +46,8 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, setActiveTab }) 
             <NavItem tabName="map" activeTab={activeTab} setActiveTab={setActiveTab}>
                 <MapIcon className="w-7 h-7" />
             </NavItem>
-            <NavItem tabName="notifications" activeTab={activeTab} setActiveTab={setActiveTab}>
-                <BellIcon className="w-7 h-7" />
+            <NavItem tabName="diary" activeTab={activeTab} setActiveTab={setActiveTab}>
+                <DiaryIcon className="w-7 h-7" />
             </NavItem>
             <NavItem tabName="profile" activeTab={activeTab} setActiveTab={setActiveTab}>
                 <UserIcon className="w-7 h-7" />

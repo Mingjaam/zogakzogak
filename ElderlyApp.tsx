@@ -3,12 +3,13 @@ import ElderlyHomeScreen from './components/screens/elderly/ElderlyHomeScreen';
 import ElderlyGalleryScreen from './components/screens/elderly/ElderlyGalleryScreen';
 import ElderlyMapScreen from './components/screens/elderly/ElderlyMapScreen';
 import ElderlyNotificationsScreen from './components/screens/elderly/ElderlyNotificationsScreen';
+import ElderlyDiaryScreen from './components/screens/elderly/ElderlyDiaryScreen';
 import ElderlyProfileScreen from './components/screens/elderly/ElderlyProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 import MedicationReminderModal from './components/modals/MedicationReminderModal';
 
-export type TabName = 'home' | 'gallery' | 'map' | 'notifications' | 'profile';
+export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
 interface ElderlyAppProps {
     onHeaderClick: () => void;
@@ -26,8 +27,8 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
                 return <ElderlyGalleryScreen />;
             case 'map':
                 return <ElderlyMapScreen />;
-            case 'notifications':
-                return <ElderlyNotificationsScreen />;
+            case 'diary':
+                return <ElderlyDiaryScreen />;
             case 'profile':
                 return <ElderlyProfileScreen />;
             default:
@@ -43,8 +44,8 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
                  return '인물 찾기';
             case 'map':
                 return '추억 찾기';
-            case 'notifications':
-                return '약 복용 알림';
+            case 'diary':
+                return '오늘의 일기';
             case 'profile':
                 return '내 정보';
             default:

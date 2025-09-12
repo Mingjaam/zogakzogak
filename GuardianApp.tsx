@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import HomeScreen from './components/screens/guardian/HomeScreen';
 import MapScreen from './components/screens/guardian/MapScreen';
 import NotificationsScreen from './components/screens/guardian/NotificationsScreen';
+import DiaryScreen from './components/screens/guardian/DiaryScreen';
 import GalleryScreen from './components/screens/guardian/GalleryScreen';
 import ProfileScreen from './components/screens/guardian/ProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 
-export type TabName = 'home' | 'gallery' | 'map' | 'notifications' | 'profile';
+export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
 interface GuardianAppProps {
     onHeaderClick: () => void;
@@ -22,8 +23,8 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
                 return <HomeScreen />;
             case 'map':
                 return <MapScreen />;
-            case 'notifications':
-                return <NotificationsScreen />;
+            case 'diary':
+                return <DiaryScreen />;
             case 'gallery':
                 return <GalleryScreen />;
             case 'profile':
@@ -39,8 +40,8 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
                 return '환영합니다, 보호자님';
             case 'map':
                 return '안전구역 지도';
-            case 'notifications':
-                return '보호자 알림';
+            case 'diary':
+                return '어르신의 일기';
             case 'gallery':
                  return '추억 앨범';
             case 'profile':
