@@ -239,7 +239,7 @@ const HomeScreen: React.FC = () => {
             </div>
 
             {/* Photo Gallery Card */}
-            <div className="bg-white p-5 rounded-3xl shadow-lg border border-gray-100 text-center">
+            <div className="bg-white p-5 rounded-3xl shadow-xl border border-gray-100 text-center">
                 <div className="w-full h-56 rounded-2xl overflow-hidden mb-4">
                     <img src={photoUrl} alt="Family gathering" className="w-full h-full object-cover" />
                 </div>

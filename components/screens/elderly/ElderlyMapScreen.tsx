@@ -107,7 +107,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
 
     return (
         <div 
-            className="bg-white p-5 rounded-t-3xl shadow-[0_-4px_15px_rgba(0,0,0,0.08)] border-t border-gray-100 text-center relative -mt-8 z-10"
+            className="bg-white p-5 rounded-t-3xl shadow-[0_-8px_25px_rgba(0,0,0,0.15)] border-t border-gray-100 text-center relative -mt-8 z-10"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

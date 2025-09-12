@@ -45,7 +45,7 @@ const ElderlyNotificationsScreen: React.FC = () => {
 
     return (
         <div className="p-4">
-            <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
+            <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="bg-gray-100 p-2 rounded-full">
                       <PillIcon className="w-6 h-6 text-gray-500" />

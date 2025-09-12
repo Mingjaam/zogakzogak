@@ -68,7 +68,7 @@ const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, set
                 </div>
 
                 {/* Next Medication Card */}
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-5 flex items-center gap-5">
+                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-5 flex items-center gap-5">
                     <div className="bg-green-100 p-3 rounded-full">
                         <PillIcon className="w-6 h-6 text-green-600" />
                     </div>
@@ -79,7 +79,7 @@ const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, set
                 </div>
 
                 {/* Today's Medication Card */}
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
+                <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6">
                     <h3 className="text-lg font-bold text-gray-800 text-center mb-4">오늘의 약</h3>
                     <div className="space-y-4">
                         {/* Morning */}
