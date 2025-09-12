@@ -10,6 +10,7 @@ import { DiaryProvider } from './contexts/DiaryContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SharedDataProvider, useSharedData } from './contexts/SharedDataContext';
 import { ApiStatusProvider } from './contexts/ApiStatusContext';
+import { FamilyProvider } from './contexts/FamilyContext';
 
 const AppContent: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -107,9 +108,11 @@ const App: React.FC = () => {
     return (
         <AuthProvider>
             <ApiStatusProvider>
-                <SharedDataProvider>
-                    <AppContent />
-                </SharedDataProvider>
+                <FamilyProvider>
+                    <SharedDataProvider>
+                        <AppContent />
+                    </SharedDataProvider>
+                </FamilyProvider>
             </ApiStatusProvider>
         </AuthProvider>
     );

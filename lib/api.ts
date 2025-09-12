@@ -228,6 +228,146 @@ export interface ConnectionRequest {
   createdAt: string;
 }
 
+// Family 관련 API
+export interface Family {
+  id: string;
+  name: string;
+  members: FamilyMember[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FamilyMember {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: 'SENIOR' | 'GUARDIAN';
+  isActive: boolean;
+  joinedAt: string;
+}
+
+export interface FamilyInvitation {
+  id: string;
+  familyId: string;
+  inviterId: string;
+  inviteeEmail: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  createdAt: string;
+  expiresAt: string;
+}
+
+// Family API 함수들
+export async function getFamilies(token: string): Promise<ApiResponse<Family[]>> {
+  try {
+    const response = await apiRequest<Family[]>('/families', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 목록 조회 오류:', error);
+    return {
+      success: false,
+      error: '가족 목록을 가져올 수 없습니다.'
+    };
+  }
+}
+
+export async function createFamily(token: string, name: string): Promise<ApiResponse<Family>> {
+  try {
+    const response = await apiRequest<Family>('/families', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 생성 오류:', error);
+    return {
+      success: false,
+      error: '가족을 생성할 수 없습니다.'
+    };
+  }
+}
+
+export async function inviteToFamily(token: string, familyId: string, email: string): Promise<ApiResponse<FamilyInvitation>> {
+  try {
+    const response = await apiRequest<FamilyInvitation>(`/families/${familyId}/invite`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ email }),
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 초대 오류:', error);
+    return {
+      success: false,
+      error: '가족 초대를 보낼 수 없습니다.'
+    };
+  }
+}
+
+export async function getFamilyInvitations(token: string): Promise<ApiResponse<FamilyInvitation[]>> {
+  try {
+    const response = await apiRequest<FamilyInvitation[]>('/families/invitations', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 초대 목록 조회 오류:', error);
+    return {
+      success: false,
+      error: '가족 초대 목록을 가져올 수 없습니다.'
+    };
+  }
+}
+
+export async function acceptFamilyInvitation(token: string, invitationId: string): Promise<ApiResponse<Family>> {
+  try {
+    const response = await apiRequest<Family>(`/families/invitations/${invitationId}/accept`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 초대 수락 오류:', error);
+    return {
+      success: false,
+      error: '가족 초대를 수락할 수 없습니다.'
+    };
+  }
+}
+
+export async function getFamilyMembers(token: string, familyId: string): Promise<ApiResponse<FamilyMember[]>> {
+  try {
+    const response = await apiRequest<FamilyMember[]>(`/families/${familyId}/members`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('가족 구성원 조회 오류:', error);
+    return {
+      success: false,
+      error: '가족 구성원을 가져올 수 없습니다.'
+    };
+  }
+}
+
 // 공유 데이터 동기화 API
 export async function syncSharedData(token: string): Promise<ApiResponse<{
   memories: any[];
