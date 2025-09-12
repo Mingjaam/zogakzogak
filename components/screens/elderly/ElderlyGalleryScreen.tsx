@@ -119,7 +119,7 @@ const ElderlyGalleryScreen: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
                 <button 
                     onClick={() => setIsCameraOpen(true)}
-                    className="bg-white p-4 rounded-2xl shadow-md flex flex-col items-center justify-center gap-2 text-center hover:bg-gray-50 transition-colors"
+                    className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center justify-center gap-2 text-center hover:bg-gray-50 transition-colors"
                 >
                     <CameraMagnifierIcon className="w-14 h-14" />
                     <h2 className="text-base font-bold text-gray-800">누구인지 찾아보기</h2>
@@ -127,14 +127,14 @@ const ElderlyGalleryScreen: React.FC = () => {
                 
                 <button 
                     onClick={handleRegisterClick}
-                    className="bg-white p-4 rounded-2xl shadow-md flex flex-col items-center justify-center gap-2 text-center hover:bg-gray-50 transition-colors"
+                    className="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center justify-center gap-2 text-center hover:bg-gray-50 transition-colors"
                 >
                     <AlbumIcon className="w-14 h-14" />
                     <h2 className="text-base font-bold text-gray-800">인물 등록하기</h2>
                 </button>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl shadow-md">
+            <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">등록된 인물</h2>
                 {people.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">아직 등록된 인물이 없습니다.</p>

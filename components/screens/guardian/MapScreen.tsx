@@ -109,7 +109,7 @@ const MapScreen: React.FC = () => {
                 </div>
 
                 {/* 현재 위치 정보 카드 - 지도 위에 오버레이 */}
-                <div className="absolute top-4 left-4 bg-white p-4 rounded-2xl shadow-lg z-10 max-w-xs">
+                <div className="absolute top-4 left-4 bg-white p-4 rounded-2xl shadow-lg border border-gray-100 z-10 max-w-xs">
                     <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center gap-2">
                             <LocationPinIcon className="w-5 h-5 text-gray-500" />
@@ -130,7 +130,7 @@ const MapScreen: React.FC = () => {
                 </div>
 
                 {/* 안전구역 정보 카드 - 지도 하단에 오버레이 */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white p-4 rounded-2xl shadow-lg z-10">
+                <div className="absolute bottom-4 left-4 right-4 bg-white p-4 rounded-2xl shadow-lg border border-gray-100 z-10">
                     <div className="flex justify-between items-center mb-3">
                         <h3 className="text-sm font-bold text-gray-800">안심구역 설정</h3>
                         <button 
