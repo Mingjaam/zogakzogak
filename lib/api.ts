@@ -5,8 +5,7 @@ const API_BASE_URL = 'https://zogakzogak.ddns.net/api';
 
 // CORS 프록시 URL (GitHub Pages용 - 임시 해결책)
 // 주의: 이는 임시 해결책이며, 백엔드에서 CORS 설정이 권장됩니다.
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-const PRODUCTION_API_URL = CORS_PROXY + encodeURIComponent(API_BASE_URL);
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 // API 응답 타입 정의
 export interface ApiResponse<T = any> {
@@ -51,9 +50,8 @@ const createHeaders = (): HeadersInit => ({
 
 // 환경에 따른 API URL 결정
 function getApiUrl(endpoint: string): string {
-  const isProduction = window.location.hostname === 'mingjaam.github.io';
-  const baseUrl = isProduction ? PRODUCTION_API_URL : API_BASE_URL;
-  return `${baseUrl}${endpoint}`;
+  // 모든 환경에서 직접 API 호출 시도 (백엔드 CORS 설정 필요)
+  return `${API_BASE_URL}${endpoint}`;
 }
 
 // API 요청 래퍼 함수
@@ -63,15 +61,25 @@ async function apiRequest<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const url = getApiUrl(endpoint);
+    const isProduction = window.location.hostname === 'mingjaam.github.io';
+    
     console.log('API 요청:', url, options);
     
-    const response = await fetch(url, {
+    const fetchOptions: RequestInit = {
       ...options,
       headers: {
         ...createHeaders(),
         ...options.headers,
       },
-    });
+    };
+
+    // 프로덕션 환경에서 CORS 문제 해결을 위한 설정
+    if (isProduction) {
+      fetchOptions.mode = 'cors';
+      fetchOptions.credentials = 'omit';
+    }
+    
+    const response = await fetch(url, fetchOptions);
 
     console.log('API 응답 상태:', response.status, response.statusText);
 
