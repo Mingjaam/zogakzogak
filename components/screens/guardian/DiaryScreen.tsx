@@ -11,6 +11,7 @@ interface DiaryScreenProps {
 const DiaryScreen: React.FC<DiaryScreenProps> = () => {
   const { diaries, deleteDiary } = useDiary();
   const [selectedEntry, setSelectedEntry] = useState<typeof diaries[0] | null>(null);
+  const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   
   // 어르신이 작성한 일기만 필터링 (최신순)
   const diaryEntries = diaries.filter(diary => diary.author === 'elderly').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -97,18 +98,7 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
 
           {/* 감정 분석 그래프 */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Gemini AI 감정 분석 결과</h3>
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">🤖</span>
-                <p className="text-sm font-semibold text-blue-800">
-                  Gemini AI 감정 분석 완료
-                </p>
-              </div>
-              <p className="text-sm text-blue-700">
-                가장 높은 점수({selectedEntry.emotionScores[selectedEntry.emotion]}%)의 감정이 선택되었습니다
-              </p>
-            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">감정 분석 결과</h3>
             <EmotionChart scores={selectedEntry.emotionScores} />
           </div>
         </div>
@@ -135,13 +125,26 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
                   <EmotionCharacter emotion={entry.emotion} size="sm" />
                   <div className="flex-1">
                     <p className="font-medium text-gray-800">{entry.date}</p>
-                    <p className="text-sm text-gray-600 truncate max-w-48">{entry.content}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {expandedEntry === entry.id ? entry.content : 
+                       entry.content.length > 50 ? `${entry.content.substring(0, 50)}...` : entry.content}
+                    </p>
+                    {entry.content.length > 50 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedEntry(expandedEntry === entry.id ? null : entry.id);
+                        }}
+                        className="text-xs text-blue-600 hover:text-blue-800 mt-1"
+                      >
+                        {expandedEntry === entry.id ? '접기' : '더보기'}
+                      </button>
+                    )}
                   </div>
                 </button>
                 <div className="flex items-center gap-2">
                   <div className="text-right">
                     <div className="text-sm text-gray-500">감정 분석</div>
-                    <div className="text-xs text-gray-400">자세히 보기</div>
                   </div>
                   <button
                     onClick={(e) => {

@@ -46,7 +46,7 @@ const EmotionChart: React.FC<EmotionChartProps> = ({ scores, className = '' }) =
     <div className={`space-y-4 ${className}`}>
       {/* 지배적 감정 표시 */}
       <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
-        <div className="text-sm text-gray-600 mb-2">🤖 Gemini AI 분석 결과</div>
+        <div className="text-sm text-gray-600 mb-2">감정 분석 결과</div>
         <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full ${dominantEmotion.color} text-white font-bold text-lg shadow-lg`}>
           <div className="w-4 h-4 rounded-full bg-white opacity-90"></div>
           <span>{dominantEmotion.label}</span>

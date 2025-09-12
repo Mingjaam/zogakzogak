@@ -248,7 +248,7 @@ const HomeScreen: React.FC = () => {
                         </div>
                         <p className="text-sm text-gray-600">
                             {elderlyDiaries.length > 0 
-                                ? 'AI가 분석한 어르신의 감정 상태입니다'
+                                ? '어르신의 감정 상태입니다'
                                 : '아직 작성된 일기가 없습니다'
                             }
                         </p>

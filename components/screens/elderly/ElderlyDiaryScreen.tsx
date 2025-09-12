@@ -251,12 +251,9 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
           {/* 감정 분석 결과 */}
           {showAnalysis && analysisResult && (
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">Gemini AI 감정 분석 결과</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">감정 분석 결과</h3>
               <div className="mb-4 text-center">
                 <EmotionCharacter emotion={analysisResult.emotion} size="lg" />
-                <p className="text-sm text-gray-600 mt-2">
-                  AI가 분석한 결과입니다
-                </p>
               </div>
               <EmotionChart scores={analysisResult.scores} />
               <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
