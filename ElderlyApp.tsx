@@ -68,6 +68,7 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
                 title={getHeaderTitle()} 
                 onTitleClick={onHeaderClick}
                 onNotificationClick={() => setShowNotifications(true)}
+                showLogout={true}
             />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}

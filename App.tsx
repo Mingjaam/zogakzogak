@@ -6,11 +6,12 @@ import GuardianApp from './GuardianApp';
 import ElderlyApp from './ElderlyApp';
 import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [role, setRole] = useState<'guardian' | 'elderly' | null>(null);
+    const { isAuthenticated, isLoading: authLoading, user } = useAuth();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -21,7 +22,9 @@ const App: React.FC = () => {
     }, []);
 
     const handleLoginSuccess = () => {
-        setIsLoggedIn(true);
+        // 로그인 성공은 AuthContext에서 처리됨
+        // 사용자 역할에 따라 자동으로 적절한 화면으로 이동
+        console.log('로그인 성공, 사용자 역할에 따른 화면 전환 시작');
     };
     
     const handleRoleSelect = (selectedRole: 'guardian' | 'elderly') => {
@@ -32,11 +35,25 @@ const App: React.FC = () => {
         setRole(null);
     };
 
-    if (loading) {
+    // 사용자 역할에 따라 자동으로 역할 설정
+    useEffect(() => {
+        if (user && !role) {
+            console.log('사용자 정보:', user);
+            if (user.role === 'GUARDIAN') {
+                console.log('보호자 역할로 설정');
+                setRole('guardian');
+            } else if (user.role === 'SENIOR') {
+                console.log('어르신 역할로 설정');
+                setRole('elderly');
+            }
+        }
+    }, [user, role]);
+
+    if (loading || authLoading) {
         return <SplashScreen />;
     }
 
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
         return <AuthScreen onLoginSuccess={handleLoginSuccess} />;
     }
 
@@ -69,6 +86,14 @@ const App: React.FC = () => {
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <h1 className="text-2xl">Please select a role.</h1>
         </div>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     );
 };
 

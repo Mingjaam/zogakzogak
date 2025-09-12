@@ -1,22 +1,26 @@
 
 import React, { useState } from 'react';
 import PuzzleLogo from './icons/PuzzleLogo';
+import { registerUser, loginUser, RegisterRequest, LoginRequest, decodeJWT } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AuthScreenProps {
     onLoginSuccess: () => void;
 }
 
-interface RegisterData {
-    name: string;
+interface LoginData {
     email: string;
     password: string;
-    number: string;
-    role: 'SENIOR' | 'GUARDIAN';
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
+    const { login } = useAuth();
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [registerData, setRegisterData] = useState<RegisterData>({
+    const [loginData, setLoginData] = useState<LoginData>({
+        email: '',
+        password: ''
+    });
+    const [registerData, setRegisterData] = useState<RegisterRequest>({
         name: '',
         email: '',
         password: '',
@@ -24,10 +28,69 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
         role: 'SENIOR'
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loginSuccess, setLoginSuccess] = useState(false);
 
-    const handleLoginClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        onLoginSuccess();
+        setIsLoading(true);
+        setErrorMessage('');
+
+        try {
+            const response = await loginUser(loginData);
+            
+            if (response.success && response.data) {
+                console.log('로그인 응답 데이터:', response.data);
+                
+                // JWT 토큰에서 사용자 정보 추출
+                if (response.data.accessToken) {
+                    const tokenData = decodeJWT(response.data.accessToken);
+                    console.log('JWT 토큰 데이터:', tokenData);
+                    
+                    if (tokenData && tokenData.sub && tokenData.role) {
+                        // JWT에서 추출한 정보로 사용자 객체 생성
+                        const user = {
+                            id: tokenData.sub, // 이메일을 ID로 사용
+                            name: tokenData.sub.split('@')[0], // 이메일에서 이름 추출
+                            email: tokenData.sub,
+                            number: '', // JWT에 없으므로 빈 문자열
+                            role: tokenData.role as 'SENIOR' | 'GUARDIAN',
+                            createdAt: new Date(tokenData.iat * 1000).toISOString()
+                        };
+                        
+                        console.log('생성된 사용자 객체:', user);
+                        
+                        // AuthContext를 통해 로그인 처리
+                        login(user, response.data.accessToken);
+                        
+                        // 로그인 성공 상태 설정
+                        setLoginSuccess(true);
+                        
+                        // 로그인 성공 메시지 표시
+                        const roleText = user.role === 'SENIOR' ? '어르신' : '보호자';
+                        alert(`${user.name}님, ${roleText}으로 로그인되었습니다!`);
+                        
+                        // 잠시 후 메인 화면으로 이동
+                        setTimeout(() => {
+                            onLoginSuccess();
+                        }, 1000);
+                    } else {
+                        console.error('JWT 토큰 데이터 불완전:', tokenData);
+                        setErrorMessage('토큰에서 사용자 정보를 추출할 수 없습니다.');
+                    }
+                } else {
+                    console.error('응답에 accessToken이 없습니다:', response.data);
+                    setErrorMessage('로그인 응답에 토큰이 없습니다.');
+                }
+            } else {
+                setErrorMessage(response.message || '로그인에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('로그인 오류:', error);
+            setErrorMessage('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleRegisterClick = () => {
@@ -38,6 +101,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
 
     const handleBackToLogin = () => {
         setIsLoginMode(true);
+        setErrorMessage('');
         setRegisterData({
             name: '',
             email: '',
@@ -50,33 +114,33 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
     const handleRegisterSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setErrorMessage('');
 
         try {
-            const response = await fetch('http://52.79.251.209:8080/api/users/register', {
-                method: 'POST',
-                headers: {
-                    'accept': '*/*',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(registerData)
-            });
-
-            if (response.ok) {
+            const response = await registerUser(registerData);
+            
+            if (response.success) {
                 alert('회원가입이 완료되었습니다!');
                 handleBackToLogin();
             } else {
-                const errorData = await response.json();
-                alert(`회원가입 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
+                setErrorMessage(response.message || '회원가입에 실패했습니다.');
             }
         } catch (error) {
             console.error('회원가입 오류:', error);
-            alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+            setErrorMessage('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleInputChange = (field: keyof RegisterData, value: string) => {
+    const handleLoginInputChange = (field: keyof LoginData, value: string) => {
+        setLoginData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleRegisterInputChange = (field: keyof RegisterRequest, value: string) => {
         setRegisterData(prev => ({
             ...prev,
             [field]: value
@@ -111,28 +175,39 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                         </div>
 
                         <div className="bg-white p-8 rounded-3xl shadow-lg w-full">
-                            <form className="space-y-5">
+                            <form onSubmit={handleLoginSubmit} className="space-y-5">
+                                {errorMessage && (
+                                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                        {errorMessage}
+                                    </div>
+                                )}
                                 <div>
                                     <input
-                                        type="text"
-                                        placeholder="아이디"
+                                        type="email"
+                                        placeholder="이메일"
+                                        value={loginData.email}
+                                        onChange={(e) => handleLoginInputChange('email', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
+                                        required
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="password"
                                         placeholder="비밀번호"
+                                        value={loginData.password}
+                                        onChange={(e) => handleLoginInputChange('password', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
+                                        required
                                     />
                                 </div>
                                 <div>
                                     <button
-                                        type="button"
-                                        onClick={handleLoginClick}
-                                        className="w-full py-4 text-lg font-bold text-white bg-[#70c18c] rounded-full hover:bg-[#5da576] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#70c18c] transition-all duration-300 transform hover:scale-105"
+                                        type="submit"
+                                        disabled={isLoading || loginSuccess}
+                                        className="w-full py-4 text-lg font-bold text-white bg-[#70c18c] rounded-full hover:bg-[#5da576] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#70c18c] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        로그인
+                                        {loginSuccess ? '로그인 성공!' : isLoading ? '로그인 중...' : '로그인'}
                                     </button>
                                 </div>
                             </form>
@@ -152,12 +227,17 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
 
                         <div className="bg-white p-8 rounded-3xl shadow-lg w-full">
                             <form onSubmit={handleRegisterSubmit} className="space-y-5">
+                                {errorMessage && (
+                                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                        {errorMessage}
+                                    </div>
+                                )}
                                 <div>
                                     <input
                                         type="text"
                                         placeholder="이름"
                                         value={registerData.name}
-                                        onChange={(e) => handleInputChange('name', e.target.value)}
+                                        onChange={(e) => handleRegisterInputChange('name', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                         required
                                     />
@@ -167,7 +247,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         type="email"
                                         placeholder="이메일"
                                         value={registerData.email}
-                                        onChange={(e) => handleInputChange('email', e.target.value)}
+                                        onChange={(e) => handleRegisterInputChange('email', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                         required
                                     />
@@ -177,7 +257,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         type="password"
                                         placeholder="비밀번호"
                                         value={registerData.password}
-                                        onChange={(e) => handleInputChange('password', e.target.value)}
+                                        onChange={(e) => handleRegisterInputChange('password', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                         required
                                     />
@@ -187,7 +267,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         type="tel"
                                         placeholder="전화번호"
                                         value={registerData.number}
-                                        onChange={(e) => handleInputChange('number', e.target.value)}
+                                        onChange={(e) => handleRegisterInputChange('number', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                         required
                                     />
@@ -198,7 +278,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                     <div className="flex gap-3">
                                         <button
                                             type="button"
-                                            onClick={() => handleInputChange('role', 'SENIOR')}
+                                            onClick={() => handleRegisterInputChange('role', 'SENIOR')}
                                             className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'SENIOR'
                                                     ? 'bg-white text-gray-700 border-2 border-[#70c18c]'
@@ -214,7 +294,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => handleInputChange('role', 'GUARDIAN')}
+                                            onClick={() => handleRegisterInputChange('role', 'GUARDIAN')}
                                             className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'GUARDIAN'
                                                     ? 'bg-white text-gray-700 border-2 border-[#70c18c]'

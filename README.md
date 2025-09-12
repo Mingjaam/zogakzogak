@@ -38,6 +38,8 @@
 - **Styling**: Tailwind CSS
 - **AI Integration**: Google Gemini AI
 - **State Management**: React Hooks + Local Storage
+- **API**: RESTful API (Node.js/Express)
+- **Authentication**: JWT Token 기반 인증
 
 ## 📁 프로젝트 구조
 
@@ -80,6 +82,7 @@ zogakzogak/
    # .env.local 파일 생성
    echo "GEMINI_API_KEY=your_gemini_api_key_here" > .env.local
    ```
+
 
 4. **개발 서버 실행**
    ```bash
@@ -147,6 +150,28 @@ npm run preview
 - **이미지 인식**: Google Gemini AI를 활용한 사진 분석
 - **인물 인식**: 촬영된 사진에서 인물 자동 인식
 - **스마트 분류**: 사진 자동 분류 및 태깅
+
+## 🔌 API 연동
+
+### 인증 시스템
+- **회원가입**: 사용자 등록 및 역할 선택 (SENIOR/GUARDIAN)
+- **로그인**: JWT 토큰 기반 인증
+- **자동 로그인**: 토큰 저장 및 자동 복원
+
+### API 엔드포인트
+```
+POST /api/users/register  # 회원가입
+POST /api/users/login     # 로그인
+GET  /api/users/me        # 사용자 정보 조회
+```
+
+### API 테스트
+API 연결은 앱 내에서 직접 테스트할 수 있습니다. 회원가입 및 로그인 기능을 통해 API 연동을 확인하세요.
+
+### 환경 설정
+- **API Base URL**: `http://54.180.125.150:8080/api`
+- **인증 방식**: Bearer Token
+- **데이터 형식**: JSON
 
 ## 📱 반응형 디자인
 
