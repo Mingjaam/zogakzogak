@@ -185,8 +185,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                             onClick={() => handleInputChange('role', 'SENIOR')}
                                             className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'SENIOR'
-                                                    ? 'bg-[#70c18c] text-white shadow-md'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                    ? 'bg-white text-gray-700 border-2 border-[#70c18c]'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
                                             }`}
                                         >
                                             <img 
@@ -201,8 +201,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                             onClick={() => handleInputChange('role', 'GUARDIAN')}
                                             className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
                                                 registerData.role === 'GUARDIAN'
-                                                    ? 'bg-[#70c18c] text-white shadow-md'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                    ? 'bg-white text-gray-700 border-2 border-[#70c18c]'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
                                             }`}
                                         >
                                             <img 
