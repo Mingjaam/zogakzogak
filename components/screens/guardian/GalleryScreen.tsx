@@ -48,50 +48,6 @@ const GalleryScreen: React.FC = () => {
         }
     ]);
 
-    // 샘플 추억 데이터
-    const memories = [
-        {
-            id: 1,
-            title: "사랑하는 가족들과 함께한 시간",
-            location: "대구 월성동",
-            date: "2024.05.05",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "딸과 손자들과 함께한 즐거운 시간이었습니다."
-        },
-        {
-            id: 2,
-            title: "봄날의 산책",
-            location: "대구 수성못",
-            date: "2024.04.15",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "따뜻한 봄날 산책로를 걸으며 좋은 시간을 보냈습니다."
-        },
-        {
-            id: 3,
-            title: "생일 축하 파티",
-            location: "집",
-            date: "2024.03.20",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "65번째 생일을 가족들과 함께 축하했습니다."
-        },
-        {
-            id: 4,
-            title: "손자와의 첫 만남",
-            location: "병원",
-            date: "2024.02.10",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "첫 손자를 안아보는 순간, 세상에서 가장 행복했습니다."
-        },
-        {
-            id: 5,
-            title: "친구들과의 모임",
-            location: "카페",
-            date: "2024.01.25",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "오랜만에 만난 친구들과 즐거운 대화를 나누었습니다."
-        }
-    ];
-
     // 추억 삭제 기능
     const handleDeleteMemory = (memoryId: number) => {
         if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
