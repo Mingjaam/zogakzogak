@@ -4,7 +4,7 @@ import ElderlyGalleryScreen from './components/screens/elderly/ElderlyGalleryScr
 import ElderlyMapScreen from './components/screens/elderly/ElderlyMapScreen';
 import ElderlyNotificationsScreen from './components/screens/elderly/ElderlyNotificationsScreen';
 import ElderlyDiaryScreen from './components/screens/elderly/ElderlyDiaryScreen';
-import ElderlyProfileScreen from './components/screens/elderly/ElderlyProfileScreen';
+import UnifiedProfileScreen from './components/screens/UnifiedProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 import MedicationReminderModal from './components/modals/MedicationReminderModal';
@@ -35,7 +35,7 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
             case 'diary':
                 return <ElderlyDiaryScreen />;
             case 'profile':
-                return <ElderlyProfileScreen />;
+                return <UnifiedProfileScreen currentRole="elderly" onRoleSwitch={onHeaderClick} />;
             default:
                 return <ElderlyHomeScreen setShowModal={setShowMedicationModal} setActiveTab={setActiveTab} />;
         }

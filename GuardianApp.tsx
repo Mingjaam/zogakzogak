@@ -4,7 +4,7 @@ import MapScreen from './components/screens/guardian/MapScreen';
 import NotificationsScreen from './components/screens/guardian/NotificationsScreen';
 import DiaryScreen from './components/screens/guardian/DiaryScreen';
 import GalleryScreen from './components/screens/guardian/GalleryScreen';
-import ProfileScreen from './components/screens/guardian/ProfileScreen';
+import UnifiedProfileScreen from './components/screens/UnifiedProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 
@@ -33,7 +33,7 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
             case 'gallery':
                 return <GalleryScreen />;
             case 'profile':
-                return <ProfileScreen />;
+                return <UnifiedProfileScreen currentRole="guardian" onRoleSwitch={onHeaderClick} />;
             default:
                 return <HomeScreen />;
         }
