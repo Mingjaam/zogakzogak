@@ -4,7 +4,7 @@ import { useMemory } from '../../../contexts/MemoryContext';
 
 const GalleryScreen: React.FC = () => {
     // MemoryContext 사용
-    const { memories, deleteMemory, addMemory } = useMemory();
+    const { memories, deleteMemory, addMemory, loadMemories } = useMemory();
     
     // 상태 관리
     const [showAddMemory, setShowAddMemory] = useState(false);
@@ -412,6 +412,11 @@ const GalleryScreen: React.FC = () => {
                                         
                                         // MemoryContext를 통해서만 저장 (로컬 스토리지 자동 처리)
                                         addMemory(memoryData);
+                                        
+                                        // 저장 후 새로고침
+                                        setTimeout(() => {
+                                            loadMemories();
+                                        }, 100);
                                         
                                         alert('추억이 추가되었습니다!');
                                         handleCloseAddMemory();

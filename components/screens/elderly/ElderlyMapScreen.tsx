@@ -163,7 +163,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
 
 const ElderlyMapScreen: React.FC = () => {
     // MemoryContext 사용
-    const { memories: allMemories, deleteMemory, addMemory } = useMemory();
+    const { memories: allMemories, deleteMemory, addMemory, loadMemories } = useMemory();
     
     // 첫 번째 기억을 기본으로 선택
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories.length > 0 ? allMemories[0] : null);
@@ -669,6 +669,11 @@ const ElderlyMapScreen: React.FC = () => {
                                         
                                         // MemoryContext를 통해서만 저장 (로컬 스토리지 자동 처리)
                                         addMemory(memoryData);
+                                        
+                                        // 저장 후 새로고침
+                                        setTimeout(() => {
+                                            loadMemories();
+                                        }, 100);
                                         
                                         alert('추억이 추가되었습니다!');
                                         handleCloseAddMemory();

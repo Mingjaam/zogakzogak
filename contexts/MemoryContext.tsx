@@ -12,6 +12,8 @@ export interface Memory {
     description?: string;
   };
   imageUrl: string;
+  imageName?: string;
+  imageSize?: number;
   date: string;
   createdAt: string;
   tags: string[];
@@ -79,10 +81,17 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>) => {
     console.log("📝 addMemory called with:", memory);
     
+    // 필수 필드 검증
+    if (!memory.title || !memory.imageUrl || !memory.location) {
+      console.error("❌ 필수 필드가 누락되었습니다:", { title: memory.title, imageUrl: memory.imageUrl, location: memory.location });
+      return;
+    }
+    
     const newMemory: Memory = {
       ...memory,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
+      tags: memory.tags || [], // tags가 없으면 빈 배열로 설정
     };
     
     console.log("📝 New memory created:", newMemory);
@@ -95,6 +104,15 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       try {
         saveMemoriesToStorage(updated);
         console.log("✅ Memories saved to storage successfully");
+        
+        // 저장 후 즉시 로드해서 확인
+        const verifyMemories = loadMemoriesFromStorage();
+        console.log("🔍 저장 후 검증 - 로드된 추억 개수:", verifyMemories.length);
+        
+        // 저장이 성공했으면 상태도 업데이트
+        if (verifyMemories.length > 0) {
+          setMemories(verifyMemories);
+        }
       } catch (error) {
         console.error("❌ Error saving to storage:", error);
       }
@@ -122,7 +140,9 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   };
 
   const loadMemories = () => {
+    console.log("🔄 loadMemories 호출됨");
     const loadedMemories = loadMemoriesFromStorage();
+    console.log("📊 로드된 추억 개수:", loadedMemories.length);
     setMemories(loadedMemories);
   };
 
