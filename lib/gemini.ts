@@ -9,7 +9,7 @@ export interface Person {
 
 export type EmotionType = 'joy' | 'happiness' | 'surprise' | 'sadness' | 'anger' | 'fear';
 
-const ai = new GoogleGenAI({ apiKey: "AIzaSyA88oSIDCgmGcNpDxVAmCUYnkA7K6t1j2o" });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY });
 
 const fileToGenerativePart = (base64: string, mimeType: string) => {
     return {
