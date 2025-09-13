@@ -9,7 +9,6 @@ import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SharedDataProvider, useSharedData } from './contexts/SharedDataContext';
-import { ApiStatusProvider } from './contexts/ApiStatusContext';
 import { FamilyProvider } from './contexts/FamilyContext';
 
 const AppContent: React.FC = () => {
@@ -107,13 +106,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <AuthProvider>
-            <ApiStatusProvider>
-                <FamilyProvider>
-                    <SharedDataProvider>
-                        <AppContent />
-                    </SharedDataProvider>
-                </FamilyProvider>
-            </ApiStatusProvider>
+            <FamilyProvider>
+                <SharedDataProvider>
+                    <AppContent />
+                </SharedDataProvider>
+            </FamilyProvider>
         </AuthProvider>
     );
 };

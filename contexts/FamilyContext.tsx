@@ -60,29 +60,40 @@ export const FamilyProvider: React.FC<FamilyProviderProps> = ({ children }) => {
       console.log('ℹ️ Family API는 현재 사용할 수 없음, 로컬 데이터 사용');
       loadFamiliesFromStorage();
       
-      // 기본 가족이 없으면 자동 생성
-      if (families.length === 0) {
-        const defaultFamily: Family = {
-          id: `family_${Date.now()}`,
-          name: `${user.name}의 가족`,
-          members: [{
-            id: `member_${Date.now()}`,
-            userId: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            isActive: true,
-            joinedAt: new Date().toISOString()
-          }],
-          createdAt: new Date().toISOString(),
+      // 더미 가족 데이터 생성
+      const dummyFamilies: Family[] = [
+        {
+          id: 'family_1',
+          name: '김씨 가족',
+          members: [
+            {
+              id: 'member_1',
+              userId: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+              isActive: true,
+              joinedAt: new Date().toISOString()
+            },
+            {
+              id: 'member_2',
+              userId: 'user_2',
+              name: '김철수',
+              email: 'guardian@example.com',
+              role: user.role === 'SENIOR' ? 'GUARDIAN' : 'SENIOR',
+              isActive: true,
+              joinedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+            }
+          ],
+          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
           updatedAt: new Date().toISOString()
-        };
-        
-        setFamilies([defaultFamily]);
-        setCurrentFamily(defaultFamily);
-        saveFamiliesToStorage([defaultFamily]);
-        console.log('✅ 기본 가족 생성됨:', defaultFamily.name);
-      }
+        }
+      ];
+      
+      setFamilies(dummyFamilies);
+      setCurrentFamily(dummyFamilies[0]);
+      saveFamiliesToStorage(dummyFamilies);
+      console.log('✅ 더미 가족 데이터 생성됨:', dummyFamilies[0].name);
     } catch (error) {
       console.error('가족 목록 로드 오류:', error);
       setError('가족 목록을 불러올 수 없습니다.');

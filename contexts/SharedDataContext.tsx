@@ -127,59 +127,109 @@ export const SharedDataProvider: React.FC<SharedDataProviderProps> = ({ children
   const checkConnectionAndSync = async () => {
     setIsLoading(true);
     try {
-      // 실제 API에서 데이터 가져오기 (작동하는 API만)
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        console.log('🔄 API에서 데이터 동기화 시작...');
-        
-        // memories API 테스트 (작동함)
-        try {
-          const memoriesResponse = await apiRequest<any[]>('/memories', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-          
-          if (memoriesResponse.success && memoriesResponse.data) {
-            setSharedMemories(memoriesResponse.data);
-            console.log('✅ API에서 메모리 데이터 로드됨:', memoriesResponse.data.length, '개');
-          } else {
-            console.log('⚠️ 메모리 API 응답 없음, 로컬 데이터 사용');
-          }
-        } catch (error) {
-          console.log('⚠️ 메모리 API 오류, 로컬 데이터 사용:', error);
-        }
-
-        // medications API 테스트 (작동함)
-        try {
-          const medicationsResponse = await apiRequest<any[]>('/medications', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-          
-          if (medicationsResponse.success && medicationsResponse.data) {
-            setSharedMedications(medicationsResponse.data);
-            console.log('✅ API에서 약물 데이터 로드됨:', medicationsResponse.data.length, '개');
-          } else {
-            console.log('⚠️ 약물 API 응답 없음, 로컬 데이터 사용');
-          }
-        } catch (error) {
-          console.log('⚠️ 약물 API 오류, 로컬 데이터 사용:', error);
-        }
-
-        // locations와 notifications는 API가 없으므로 로컬 데이터만 사용
-        console.log('ℹ️ 위치 및 알림 데이터는 로컬에서만 관리');
-      }
+      // 더미데이터로 초기화
+      console.log('🔄 더미데이터로 초기화...');
       
-      // 로컬 스토리지에서도 데이터 로드 (백업)
-      loadSharedDataFromStorage();
+      // 더미 메모리 데이터
+      const dummyMemories = [
+        {
+          id: 'memory_1',
+          title: '오늘의 산책',
+          content: '공원에서 산책을 했습니다. 날씨가 좋아서 기분이 좋았어요.',
+          date: new Date().toISOString(),
+          location: '한강공원',
+          mood: 'happy',
+          images: []
+        },
+        {
+          id: 'memory_2',
+          title: '가족과의 식사',
+          content: '가족들과 함께 맛있는 저녁을 먹었습니다.',
+          date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          location: '집',
+          mood: 'content',
+          images: []
+        }
+      ];
+      setSharedMemories(dummyMemories);
+
+      // 더미 약물 데이터
+      const dummyMedications = [
+        {
+          id: 'med_1',
+          name: '혈압약',
+          dosage: '1정',
+          frequency: '하루 1회',
+          time: '아침',
+          startDate: new Date().toISOString(),
+          endDate: null,
+          isActive: true,
+          notes: '식후 30분에 복용'
+        },
+        {
+          id: 'med_2',
+          name: '비타민',
+          dosage: '2정',
+          frequency: '하루 1회',
+          time: '점심',
+          startDate: new Date().toISOString(),
+          endDate: null,
+          isActive: true,
+          notes: '식사와 함께 복용'
+        }
+      ];
+      setSharedMedications(dummyMedications);
+
+      // 더미 위치 데이터
+      const dummyLocations = [
+        {
+          id: 'loc_1',
+          name: '집',
+          address: '서울시 강남구',
+          latitude: 37.5665,
+          longitude: 126.9780,
+          timestamp: new Date().toISOString(),
+          isSafeZone: true
+        },
+        {
+          id: 'loc_2',
+          name: '병원',
+          address: '서울시 강남구 병원',
+          latitude: 37.5665,
+          longitude: 126.9780,
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          isSafeZone: false
+        }
+      ];
+      setSharedLocations(dummyLocations);
+
+      // 더미 알림 데이터
+      const dummyNotifications = [
+        {
+          id: 'notif_1',
+          title: '약물 복용 알림',
+          message: '혈압약을 복용할 시간입니다.',
+          type: 'medication',
+          timestamp: new Date().toISOString(),
+          isRead: false
+        },
+        {
+          id: 'notif_2',
+          title: '안전구역 알림',
+          message: '안전구역을 벗어났습니다.',
+          type: 'safety',
+          timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+          isRead: true
+        }
+      ];
+      setSharedNotifications(dummyNotifications);
+
+      console.log('✅ 더미데이터 초기화 완료');
+      
+      // 로컬 스토리지에도 저장
+      saveSharedDataToStorage();
     } catch (error) {
-      console.error('데이터 동기화 오류:', error);
-      // 오류 시 로컬 스토리지에서 로드
-      loadSharedDataFromStorage();
+      console.error('데이터 초기화 오류:', error);
     } finally {
       setIsLoading(false);
     }

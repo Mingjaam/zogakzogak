@@ -9,7 +9,6 @@ import MedicationManagementScreen from './components/MedicationManagementScreen'
 import FamilyManagementScreen from './components/FamilyManagementScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
-import ApiStatusDashboard from './components/ApiStatusDashboard';
 
 export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'medication' | 'family' | 'profile';
 

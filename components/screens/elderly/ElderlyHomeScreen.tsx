@@ -3,7 +3,6 @@ import PuzzleCameraIcon from '../../icons/PuzzleCameraIcon';
 import PuzzleBookIcon from '../../icons/PuzzleBookIcon';
 import PuzzlePillIcon from '../../icons/PuzzlePillIcon';
 import HelpPhoneIcon from '../../icons/HelpPhoneIcon';
-import ApiStatusDashboard from '../../ApiStatusDashboard';
 
 interface ElderlyHomeScreenProps {
     setShowModal: (show: boolean) => void;
@@ -36,10 +35,6 @@ const PillIcon: React.FC<{ className?: string }> = ({ className }) => {
 const ElderlyHomeScreen: React.FC<ElderlyHomeScreenProps> = ({ setShowModal, setActiveTab }) => {
     return (
         <div className="min-h-screen bg-white">
-            {/* API 상태 대시보드 */}
-            <div className="px-6 pt-6">
-                <ApiStatusDashboard />
-            </div>
             
             {/* Welcome Section */}
             <div className="px-6 pb-4">
