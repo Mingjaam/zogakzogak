@@ -79,6 +79,19 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
         <p className="text-xs text-gray-500 mt-1">총 {diaryEntries.length}개의 일기</p>
       </div>
 
+      {/* 빈 상태 (일기가 없을 때) */}
+      {diaryEntries.length === 0 && (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-600 mb-2">아직 작성된 일기가 없습니다</h3>
+          <p className="text-gray-500 mb-4">어르신이 첫 번째 일기를 작성하면 여기에 표시됩니다</p>
+        </div>
+      )}
+
       {/* 선택된 일기 상세 */}
       {selectedEntry && (
         <div className="space-y-6">
@@ -108,7 +121,17 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-700 mb-3">최근 일기</h3>
         <div className="space-y-3">
-          {diaryEntries.map((entry) => (
+          {diaryEntries.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-500 text-sm">작성된 일기가 없습니다</p>
+            </div>
+          ) : (
+            diaryEntries.map((entry) => (
             <div
               key={entry.id}
               className={`w-full p-4 rounded-2xl shadow-lg border transition-all ${
@@ -161,7 +184,8 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
