@@ -27,24 +27,56 @@ interface MemoryContextType {
 
 const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
 
+// 기존 데이터 마이그레이션 (userMemories -> zogakzogak_memories)
+const migrateOldData = (): Memory[] => {
+  try {
+    const oldData = localStorage.getItem('userMemories');
+    if (oldData) {
+      const memories = JSON.parse(oldData);
+      if (Array.isArray(memories) && memories.length > 0) {
+        console.log('🔄 기존 데이터 마이그레이션 중:', memories.length, '개');
+        localStorage.setItem('zogakzogak_memories', oldData);
+        localStorage.removeItem('userMemories');
+        console.log('✅ 데이터 마이그레이션 완료');
+        return memories;
+      }
+    }
+  } catch (error) {
+    console.error('❌ 데이터 마이그레이션 실패:', error);
+  }
+  return [];
+};
+
 // 로컬 스토리지에서 추억 로드
 const loadMemoriesFromStorage = (): Memory[] => {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const stored = localStorage.getItem('userMemories');
-      console.log('🔍 로컬 스토리지에서 추억 데이터 로드:', stored);
-      
-      if (stored) {
-        const memories = JSON.parse(stored);
-        console.log('✅ 파싱된 추억 데이터:', memories);
-        return memories;
-      } else {
-        console.log('📝 저장된 추억 데이터가 없습니다.');
-        return [];
-      }
+    // PWA 환경에서 localStorage 접근 확인
+    if (typeof window === 'undefined') {
+      console.log('❌ window 객체가 없습니다 (SSR 환경)');
+      return [];
     }
-    console.log('❌ window 또는 localStorage가 사용할 수 없습니다.');
-    return [];
+    
+    if (!window.localStorage) {
+      console.log('❌ localStorage를 사용할 수 없습니다');
+      return [];
+    }
+    
+    const stored = localStorage.getItem('zogakzogak_memories');
+    console.log('🔍 로컬 스토리지에서 추억 데이터 로드:', stored ? '데이터 있음' : '데이터 없음');
+    
+    if (stored) {
+      const memories = JSON.parse(stored);
+      console.log('✅ 파싱된 추억 데이터 개수:', memories.length);
+      return Array.isArray(memories) ? memories : [];
+    } else {
+      // 기존 데이터가 있는지 확인하고 마이그레이션
+      const migratedMemories = migrateOldData();
+      if (migratedMemories.length > 0) {
+        return migratedMemories;
+      }
+      console.log('📝 저장된 추억 데이터가 없습니다.');
+      return [];
+    }
   } catch (error) {
     console.error('❌ 로컬 스토리지에서 추억 로드 실패:', error);
     return [];
@@ -54,14 +86,40 @@ const loadMemoriesFromStorage = (): Memory[] => {
 // 로컬 스토리지에 추억 저장
 const saveMemoriesToStorage = (memories: Memory[]): void => {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const dataToStore = JSON.stringify(memories);
-      console.log('💾 추억 데이터 저장 중:', memories.length, '개');
-      localStorage.setItem('userMemories', dataToStore);
-      console.log('✅ 추억 데이터 저장 완료');
-    } else {
-      console.log('❌ localStorage를 사용할 수 없습니다.');
+    // PWA 환경에서 localStorage 접근 확인
+    if (typeof window === 'undefined') {
+      console.log('❌ window 객체가 없습니다 (SSR 환경)');
+      return;
     }
+    
+    if (!window.localStorage) {
+      console.log('❌ localStorage를 사용할 수 없습니다');
+      return;
+    }
+    
+    const dataToStore = JSON.stringify(memories);
+    console.log('💾 추억 데이터 저장 중:', memories.length, '개');
+    
+    // PWA에서 안정적인 저장을 위해 try-catch로 감싸고 재시도 로직 추가
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    const saveWithRetry = () => {
+      try {
+        localStorage.setItem('zogakzogak_memories', dataToStore);
+        console.log('✅ 추억 데이터 저장 완료');
+      } catch (error) {
+        retryCount++;
+        if (retryCount < maxRetries) {
+          console.log(`🔄 저장 재시도 ${retryCount}/${maxRetries}`);
+          setTimeout(saveWithRetry, 100 * retryCount); // 지수 백오프
+        } else {
+          throw error;
+        }
+      }
+    };
+    
+    saveWithRetry();
   } catch (error) {
     console.error('❌ 로컬 스토리지에 추억 저장 실패:', error);
   }
@@ -102,23 +160,28 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       loadMemories();
     };
 
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('load', handleLoad);
+    // PWA 환경에서 안전하게 이벤트 리스너 추가
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleFocus);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('load', handleLoad);
+    }
 
     return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('load', handleLoad);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleFocus);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('load', handleLoad);
+      }
     };
   }, []);
 
-  // 주기적으로 데이터 동기화 (PWA에서 중요)
+  // 주기적으로 데이터 동기화 (PWA에서 중요) - 빈도 줄임
   useEffect(() => {
     const interval = setInterval(() => {
       console.log('⏰ 주기적 데이터 동기화');
       loadMemories();
-    }, 5000); // 5초마다 동기화
+    }, 30000); // 30초마다 동기화 (성능 개선)
 
     return () => clearInterval(interval);
   }, []);
@@ -127,6 +190,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     console.log('📂 추억 데이터 로드 함수 호출');
     const loadedMemories = loadMemoriesFromStorage();
     console.log('📊 로드된 추억 개수:', loadedMemories.length);
+    
     setMemories(loadedMemories);
     setIsLoaded(true);
   };
@@ -145,6 +209,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     setMemories(prev => {
       const updated = [newMemory, ...prev];
       console.log('📝 MemoryContext - 업데이트된 추억 목록:', updated.length, '개');
+      
       // 모든 추억을 로컬 스토리지에 저장
       saveMemoriesToStorage(updated);
       return updated;
