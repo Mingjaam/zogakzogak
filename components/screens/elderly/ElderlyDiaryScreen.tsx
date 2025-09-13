@@ -248,24 +248,77 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
             </div>
           </div>
 
-          {/* 감정 분석 결과 */}
+          {/* 감정 분석 결과 모달 */}
           {showAnalysis && analysisResult && (
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">감정 분석 결과</h3>
-              <div className="mb-4 text-center">
-                <EmotionCharacter emotion={analysisResult.emotion} size="lg" />
-              </div>
-              <EmotionChart scores={analysisResult.scores} />
-              <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🎯</span>
-                  <p className="text-sm font-semibold text-green-800">
-                    오늘의 기분이 결정되었습니다!
-                  </p>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                {/* 모달 헤더 */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-800">감정 분석 결과</h3>
+                  <button
+                    onClick={() => {
+                      setShowAnalysis(false);
+                      setAnalysisResult(null);
+                    }}
+                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <p className="text-sm text-green-700">
-                  가장 높은 점수({analysisResult.scores[analysisResult.emotion]}%)의 감정이 오늘의 기분으로 설정됩니다.
-                </p>
+
+                {/* 모달 내용 */}
+                <div className="p-6">
+                  <div className="mb-6 text-center">
+                    <EmotionCharacter emotion={analysisResult.emotion} size="xl" />
+                    <h4 className="text-lg font-semibold text-gray-800 mt-3">
+                      {analysisResult.emotion === 'joy' ? '기뻐요' : 
+                       analysisResult.emotion === 'happiness' ? '행복함' :
+                       analysisResult.emotion === 'surprise' ? '놀라움' :
+                       analysisResult.emotion === 'sadness' ? '슬퍼요' :
+                       analysisResult.emotion === 'anger' ? '화나요' : '두려워요'}
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {analysisResult.scores[analysisResult.emotion]}%의 확률
+                    </p>
+                  </div>
+
+                  <div className="mb-6">
+                    <EmotionChart scores={analysisResult.scores} />
+                  </div>
+
+                  <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">🎯</span>
+                      <p className="text-sm font-semibold text-green-800">
+                        오늘의 기분이 결정되었습니다!
+                      </p>
+                    </div>
+                    <p className="text-sm text-green-700">
+                      가장 높은 점수의 감정이 오늘의 기분으로 설정됩니다.
+                    </p>
+                  </div>
+
+                  {/* 버튼들 */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setShowAnalysis(false);
+                        setAnalysisResult(null);
+                      }}
+                      className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                    >
+                      다시 분석
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className="flex-1 px-4 py-3 bg-[#70c18c] text-white rounded-xl font-medium hover:bg-[#5aa876] transition-colors"
+                    >
+                      일기 저장하기
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
