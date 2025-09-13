@@ -13,6 +13,40 @@ const GalleryScreen: React.FC = () => {
     const [memoryDate, setMemoryDate] = useState('');
     const [locationDescription, setLocationDescription] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [memories, setMemories] = useState([
+        {
+            id: 1,
+            title: "사랑하는 가족들과 함께한 시간",
+            location: "대구 월성동",
+            date: "2024.05.05",
+            imageUrl: "https://i.imgur.com/k2m3s4f.png",
+            description: "딸과 손자들과 함께한 즐거운 시간이었습니다."
+        },
+        {
+            id: 2,
+            title: "봄날의 산책",
+            location: "대구 수성못",
+            date: "2024.04.15",
+            imageUrl: "https://i.imgur.com/k2m3s4f.png",
+            description: "따뜻한 봄날 산책로를 걸으며 좋은 시간을 보냈습니다."
+        },
+        {
+            id: 3,
+            title: "생일 축하 파티",
+            location: "집",
+            date: "2024.03.20",
+            imageUrl: "https://i.imgur.com/k2m3s4f.png",
+            description: "65번째 생일을 가족들과 함께 축하했습니다."
+        },
+        {
+            id: 4,
+            title: "손자와의 첫 만남",
+            location: "병원",
+            date: "2024.02.10",
+            imageUrl: "https://i.imgur.com/k2m3s4f.png",
+            description: "첫 손자를 안아보는 순간, 세상에서 가장 행복했습니다."
+        }
+    ]);
 
     // 샘플 추억 데이터
     const memories = [
@@ -57,6 +91,14 @@ const GalleryScreen: React.FC = () => {
             description: "오랜만에 만난 친구들과 즐거운 대화를 나누었습니다."
         }
     ];
+
+    // 추억 삭제 기능
+    const handleDeleteMemory = (memoryId: number) => {
+        if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
+            setMemories(prevMemories => prevMemories.filter(memory => memory.id !== memoryId));
+            alert('추억이 삭제되었습니다.');
+        }
+    };
 
     // 추억 추가 관련 함수들
     const handleAddMemory = () => {
@@ -172,7 +214,18 @@ const GalleryScreen: React.FC = () => {
                             
                             {/* 내용 */}
                             <div className="flex-1 p-4">
-                                <h3 className="font-bold text-lg text-gray-800 mb-2">{memory.title}</h3>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-bold text-lg text-gray-800">{memory.title}</h3>
+                                    <button
+                                        onClick={() => handleDeleteMemory(memory.id)}
+                                        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                        title="추억 삭제"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm text-gray-500">📍 {memory.location}</span>
                                     <span className="text-sm text-gray-500">📅 {memory.date}</span>
