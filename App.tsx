@@ -45,36 +45,25 @@ const App: React.FC = () => {
         return <RoleSelectionScreen onSelectRole={handleRoleSelect} />;
     }
 
-    if (role === 'guardian') {
-        return (
-            <MemoryProvider>
+    // MemoryProvider를 최상위로 이동 (역할 전환 시에도 데이터 유지)
+    return (
+        <MemoryProvider>
+            {role === 'guardian' ? (
                 <DiaryProvider>
                     <SafeZoneProvider>
                         <GuardianApp onHeaderClick={handleRoleReset} />
                     </SafeZoneProvider>
                 </DiaryProvider>
-            </MemoryProvider>
-        );
-    }
-
-    if (role === 'elderly') {
-        return (
-            <MemoryProvider>
+            ) : (
                 <DiaryProvider>
                     <SafeZoneProvider>
                         <ElderlyApp onHeaderClick={handleRoleReset} />
                     </SafeZoneProvider>
                 </DiaryProvider>
-            </MemoryProvider>
-        );
-    }
-
-    // Fallback just in case
-    return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
-            <h1 className="text-2xl">Please select a role.</h1>
-        </div>
+            )}
+        </MemoryProvider>
     );
+
 };
 
 export default App;

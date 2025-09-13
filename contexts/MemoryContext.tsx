@@ -96,13 +96,31 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       }
     };
 
+    // 페이지 로드 완료 후에도 한 번 더 로드
+    const handleLoad = () => {
+      console.log('🔄 페이지 로드 완료 - 추억 데이터 새로고침');
+      loadMemories();
+    };
+
     window.addEventListener('focus', handleFocus);
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('load', handleLoad);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('load', handleLoad);
     };
+  }, []);
+
+  // 주기적으로 데이터 동기화 (PWA에서 중요)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('⏰ 주기적 데이터 동기화');
+      loadMemories();
+    }, 5000); // 5초마다 동기화
+
+    return () => clearInterval(interval);
   }, []);
 
   const loadMemories = () => {
