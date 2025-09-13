@@ -368,7 +368,7 @@ const GalleryScreen: React.FC = () => {
                                 취소
                             </button>
                             <button
-                                onClick={() => {
+                                onClick={async () => {
                                     if (!selectedImage) {
                                         alert('사진을 선택해주세요.');
                                         return;
@@ -382,40 +382,46 @@ const GalleryScreen: React.FC = () => {
                                         return;
                                     }
                                     
-                                    // 이미지를 Base64로 변환
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        const imageData = e.target?.result as string;
+                                    try {
+                                        // 이미지 크기 제한 (5MB)
+                                        if (selectedImage.size > 5 * 1024 * 1024) {
+                                            alert('이미지 크기가 너무 큽니다. 5MB 이하의 이미지를 선택해주세요.');
+                                            return;
+                                        }
+                                        
+                                        // 이미지를 Base64로 변환
+                                        const imageData = await new Promise<string>((resolve, reject) => {
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => {
+                                                if (e.target?.result) {
+                                                    resolve(e.target.result as string);
+                                                } else {
+                                                    reject(new Error('이미지 읽기 실패'));
+                                                }
+                                            };
+                                            reader.onerror = () => reject(new Error('이미지 읽기 오류'));
+                                            reader.readAsDataURL(selectedImage);
+                                        });
                                         
                                         // 추억 데이터 생성
                                         const memoryData = {
+                                            id: Date.now(),
                                             title: memoryTitle,
                                             description: memoryDescription,
                                             date: memoryDate || new Date().toISOString().split('T')[0],
-                                            location: {
-                                                lat: selectedLocation.lat,
-                                                lng: selectedLocation.lng,
-                                                address: selectedLocation.address,
-                                                description: locationDescription
-                                            },
-                                            imageUrl: imageData,
-                                            imageName: selectedImage.name,
-                                            imageSize: selectedImage.size
+                                            location: selectedLocation.address,
+                                            imageUrl: imageData
                                         };
                                         
-                                        // 로컬 스토리지에 저장
-                                        const savedMemory = saveMemoryToLocalStorage(memoryData);
+                                        // 상태 업데이트로 새로운 추억 반영 (페이지 새로고침 대신)
+                                        setMemories(prevMemories => [...prevMemories, memoryData]);
                                         
-                                        if (savedMemory) {
-                                            alert('추억이 추가되었습니다!');
-                                            handleCloseAddMemory();
-                                            // 페이지 새로고침으로 새로운 추억 반영
-                                            window.location.reload();
-                                        } else {
-                                            alert('저장 중 오류가 발생했습니다.');
-                                        }
-                                    };
-                                    reader.readAsDataURL(selectedImage);
+                                        alert('추억이 추가되었습니다!');
+                                        handleCloseAddMemory();
+                                    } catch (error) {
+                                        console.error('추억 추가 오류:', error);
+                                        alert('추억 추가 중 오류가 발생했습니다. 다시 시도해주세요.');
+                                    }
                                 }}
                                 className="flex-1 py-3 px-4 bg-[#70c18c] text-white rounded-xl hover:bg-[#5da576] transition-colors font-medium"
                             >
