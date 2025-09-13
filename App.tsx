@@ -6,6 +6,7 @@ import GuardianApp from './GuardianApp';
 import ElderlyApp from './ElderlyApp';
 import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
+import { MemoryProvider } from './contexts/MemoryContext';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -46,21 +47,25 @@ const App: React.FC = () => {
 
     if (role === 'guardian') {
         return (
-            <DiaryProvider>
-                <SafeZoneProvider>
-                    <GuardianApp onHeaderClick={handleRoleReset} />
-                </SafeZoneProvider>
-            </DiaryProvider>
+            <MemoryProvider>
+                <DiaryProvider>
+                    <SafeZoneProvider>
+                        <GuardianApp onHeaderClick={handleRoleReset} />
+                    </SafeZoneProvider>
+                </DiaryProvider>
+            </MemoryProvider>
         );
     }
 
     if (role === 'elderly') {
         return (
-            <DiaryProvider>
-                <SafeZoneProvider>
-                    <ElderlyApp onHeaderClick={handleRoleReset} />
-                </SafeZoneProvider>
-            </DiaryProvider>
+            <MemoryProvider>
+                <DiaryProvider>
+                    <SafeZoneProvider>
+                        <ElderlyApp onHeaderClick={handleRoleReset} />
+                    </SafeZoneProvider>
+                </DiaryProvider>
+            </MemoryProvider>
         );
     }
 

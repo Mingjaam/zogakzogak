@@ -1,21 +1,13 @@
 import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
-import { Memory, dummyMemories } from '../../../types/memory';
+import { Memory } from '../../../types/memory';
+import { useMemory } from '../../../contexts/MemoryContext';
 
 // Google Maps 타입 정의
 declare global {
   interface Window {
     google: any;
     googleMapsApiLoaded: boolean;
-  }
-  namespace google {
-    namespace maps {
-      class Map {
-        constructor(element: HTMLElement, options?: any);
-        panTo(latLng: { lat: number; lng: number }): void;
-        setZoom(zoom: number): void;
-      }
-    }
   }
 }
 
@@ -163,8 +155,17 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
             {/* Delete button */}
             <div className="mt-4 pt-4 border-t border-gray-200">
                 <button
-                    onClick={() => onMemoryDelete(memory.id)}
-                    className="w-full px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onMemoryDelete(memory.id);
+                    }}
+                    onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onMemoryDelete(memory.id);
+                    }}
+                    className="w-full px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 active:bg-red-300 transition-colors flex items-center justify-center gap-2 touch-manipulation"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -177,19 +178,8 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
 };
 
 const ElderlyMapScreen: React.FC = () => {
-    // 로컬 스토리지에서 추억 로드
-    const [userMemories, setUserMemories] = useState<any[]>([]);
-    const [allMemories, setAllMemories] = useState<Memory[]>([]);
-    
-    // 모든 추억 (더미 + 사용자) 결합
-    React.useEffect(() => {
-        const loadedMemories = loadMemoriesFromLocalStorage();
-        setUserMemories(loadedMemories);
-        
-        // 더미 추억과 사용자 추억 결합
-        const combinedMemories = [...loadedMemories, ...dummyMemories];
-        setAllMemories(combinedMemories);
-    }, []);
+    // MemoryContext 사용
+    const { memories: allMemories, deleteMemory, addMemory } = useMemory();
     
     // 첫 번째 기억을 기본으로 선택
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories[0] || null);
@@ -245,31 +235,46 @@ const ElderlyMapScreen: React.FC = () => {
     };
 
     const handleMemoryDelete = (memoryId: string) => {
-        if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
-            // 사용자 추억에서 삭제
-            const updatedUserMemories = userMemories.filter(memory => memory.id !== memoryId);
-            setUserMemories(updatedUserMemories);
-            
-            // 로컬 스토리지에서도 삭제
-            localStorage.setItem('user_memories', JSON.stringify(updatedUserMemories));
-            
-            // 전체 추억 목록에서도 삭제
-            const updatedAllMemories = allMemories.filter(memory => memory.id !== memoryId);
-            setAllMemories(updatedAllMemories);
-            
-            // 삭제된 추억이 현재 선택된 추억이면 다음 추억으로 이동
-            if (selectedMemory?.id === memoryId) {
-                if (updatedAllMemories.length > 0) {
-                    const newIndex = Math.min(currentMemoryIndex, updatedAllMemories.length - 1);
-                    setCurrentMemoryIndex(newIndex);
-                    setSelectedMemory(updatedAllMemories[newIndex]);
-                } else {
-                    setSelectedMemory(null);
-                    setCurrentMemoryIndex(0);
+        // PWA 환경에서 더 안정적인 확인 다이얼로그
+        const confirmDelete = () => {
+            try {
+                // MemoryContext를 통해 삭제
+                deleteMemory(memoryId);
+                
+                // 삭제된 추억이 현재 선택된 추억이면 다음 추억으로 이동
+                if (selectedMemory?.id === memoryId) {
+                    const updatedMemories = allMemories.filter(memory => memory.id !== memoryId);
+                    if (updatedMemories.length > 0) {
+                        const newIndex = Math.min(currentMemoryIndex, updatedMemories.length - 1);
+                        setCurrentMemoryIndex(newIndex);
+                        setSelectedMemory(updatedMemories[newIndex]);
+                    } else {
+                        setSelectedMemory(null);
+                        setCurrentMemoryIndex(0);
+                    }
+                }
+                
+                // 성공 메시지
+                console.log('추억이 삭제되었습니다.');
+                if (typeof window !== 'undefined' && window.alert) {
+                    alert('추억이 삭제되었습니다.');
+                }
+            } catch (error) {
+                console.error('추억 삭제 중 오류 발생:', error);
+                if (typeof window !== 'undefined' && window.alert) {
+                    alert('추억 삭제 중 오류가 발생했습니다.');
                 }
             }
-            
-            alert('추억이 삭제되었습니다.');
+        };
+
+        // PWA 환경에서 더 안정적인 확인 처리
+        if (typeof window !== 'undefined' && window.confirm) {
+            if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
+                confirmDelete();
+            }
+        } else {
+            // PWA 환경에서 confirm이 작동하지 않는 경우 직접 삭제
+            confirmDelete();
         }
     };
 
@@ -356,30 +361,14 @@ const ElderlyMapScreen: React.FC = () => {
 
     const saveMemoryToLocalStorage = (memoryData: any) => {
         try {
-            const existingMemories = JSON.parse(localStorage.getItem('userMemories') || '[]');
-            const newMemory = {
-                ...memoryData,
-                id: Date.now().toString(),
-                createdAt: new Date().toISOString()
-            };
-            existingMemories.unshift(newMemory); // 최신순으로 추가
-            localStorage.setItem('userMemories', JSON.stringify(existingMemories));
-            return newMemory;
+            addMemory(memoryData);
+            return true;
         } catch (error) {
-            console.error('로컬 스토리지 저장 실패:', error);
-            return null;
+            console.error('추억 저장 실패:', error);
+            return false;
         }
     };
 
-    const loadMemoriesFromLocalStorage = () => {
-        try {
-            const memories = JSON.parse(localStorage.getItem('userMemories') || '[]');
-            return memories;
-        } catch (error) {
-            console.error('로컬 스토리지 로드 실패:', error);
-            return [];
-        }
-    };
 
     return (
         <div className="h-full flex flex-col">

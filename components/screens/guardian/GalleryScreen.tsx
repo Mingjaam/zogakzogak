@@ -1,7 +1,11 @@
 import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
+import { useMemory } from '../../../contexts/MemoryContext';
 
 const GalleryScreen: React.FC = () => {
+    // MemoryContext 사용
+    const { memories, deleteMemory, addMemory } = useMemory();
+    
     // 상태 관리
     const [showAddMemory, setShowAddMemory] = useState(false);
     const [showLocationPicker, setShowLocationPicker] = useState(false);
@@ -12,47 +16,34 @@ const GalleryScreen: React.FC = () => {
     const [memoryDescription, setMemoryDescription] = useState('');
     const [memoryDate, setMemoryDate] = useState('');
     const [locationDescription, setLocationDescription] = useState('');
+
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [memories, setMemories] = useState([
-        {
-            id: 1,
-            title: "사랑하는 가족들과 함께한 시간",
-            location: "대구 월성동",
-            date: "2024.05.05",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "딸과 손자들과 함께한 즐거운 시간이었습니다."
-        },
-        {
-            id: 2,
-            title: "봄날의 산책",
-            location: "대구 수성못",
-            date: "2024.04.15",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "따뜻한 봄날 산책로를 걸으며 좋은 시간을 보냈습니다."
-        },
-        {
-            id: 3,
-            title: "생일 축하 파티",
-            location: "집",
-            date: "2024.03.20",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "65번째 생일을 가족들과 함께 축하했습니다."
-        },
-        {
-            id: 4,
-            title: "손자와의 첫 만남",
-            location: "병원",
-            date: "2024.02.10",
-            imageUrl: "https://i.imgur.com/k2m3s4f.png",
-            description: "첫 손자를 안아보는 순간, 세상에서 가장 행복했습니다."
-        }
-    ]);
 
     // 추억 삭제 기능
-    const handleDeleteMemory = (memoryId: number) => {
-        if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
-            setMemories(prevMemories => prevMemories.filter(memory => memory.id !== memoryId));
-            alert('추억이 삭제되었습니다.');
+    const handleDeleteMemory = (memoryId: string) => {
+        const confirmDelete = () => {
+            try {
+                deleteMemory(memoryId);
+                console.log('추억이 삭제되었습니다.');
+                if (typeof window !== 'undefined' && window.alert) {
+                    alert('추억이 삭제되었습니다.');
+                }
+            } catch (error) {
+                console.error('추억 삭제 중 오류 발생:', error);
+                if (typeof window !== 'undefined' && window.alert) {
+                    alert('추억 삭제 중 오류가 발생했습니다.');
+                }
+            }
+        };
+
+        // PWA 환경에서 더 안정적인 확인 처리
+        if (typeof window !== 'undefined' && window.confirm) {
+            if (window.confirm('정말로 이 추억을 삭제하시겠습니까?')) {
+                confirmDelete();
+            }
+        } else {
+            // PWA 환경에서 confirm이 작동하지 않는 경우 직접 삭제
+            confirmDelete();
         }
     };
 
@@ -118,18 +109,11 @@ const GalleryScreen: React.FC = () => {
 
     const saveMemoryToLocalStorage = (memoryData: any) => {
         try {
-            const existingMemories = JSON.parse(localStorage.getItem('userMemories') || '[]');
-            const newMemory = {
-                ...memoryData,
-                id: Date.now().toString(),
-                createdAt: new Date().toISOString()
-            };
-            existingMemories.unshift(newMemory);
-            localStorage.setItem('userMemories', JSON.stringify(existingMemories));
-            return newMemory;
+            addMemory(memoryData);
+            return true;
         } catch (error) {
-            console.error('로컬 스토리지 저장 실패:', error);
-            return null;
+            console.error('추억 저장 실패:', error);
+            return false;
         }
     };
 
@@ -173,8 +157,17 @@ const GalleryScreen: React.FC = () => {
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-lg text-gray-800">{memory.title}</h3>
                                     <button
-                                        onClick={() => handleDeleteMemory(memory.id)}
-                                        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleDeleteMemory(memory.id);
+                                        }}
+                                        onTouchEnd={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleDeleteMemory(memory.id);
+                                        }}
+                                        className="p-2 text-red-500 hover:bg-red-50 active:bg-red-100 rounded-full transition-colors touch-manipulation"
                                         title="추억 삭제"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +176,7 @@ const GalleryScreen: React.FC = () => {
                                     </button>
                                 </div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-sm text-gray-500">📍 {memory.location}</span>
+                                    <span className="text-sm text-gray-500">📍 {memory.location.name || memory.location.address}</span>
                                     <span className="text-sm text-gray-500">📅 {memory.date}</span>
                                 </div>
                                 <p className="text-sm text-gray-600 leading-relaxed">{memory.description}</p>
