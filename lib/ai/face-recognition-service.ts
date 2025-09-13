@@ -1,7 +1,7 @@
 // 사람 인식 관련 AI 기능
 
-import { Person } from "./types";
-import { createGeminiClient, fileToGenerativePart, validateApiResponse, handleApiError } from "./gemini-client";
+import { Person } from "./ai-types";
+import { createGeminiClient, fileToGenerativePart, validateApiResponse, handleApiError } from "./gemini-api-client";
 
 /**
  * 사람을 식별하는 함수

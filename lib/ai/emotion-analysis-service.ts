@@ -1,7 +1,7 @@
 // 감정 분석 관련 AI 기능
 
-import { EmotionType, EmotionScores, EmotionAnalysisResult } from "./types";
-import { createGeminiClient, validateApiResponse, handleApiError } from "./gemini-client";
+import { EmotionType, EmotionScores, EmotionAnalysisResult } from "./ai-types";
+import { createGeminiClient, validateApiResponse, handleApiError } from "./gemini-api-client";
 
 /**
  * 일기 내용에서 감정을 분석하는 함수 (단순 분류)

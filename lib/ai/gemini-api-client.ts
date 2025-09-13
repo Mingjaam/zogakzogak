@@ -1,7 +1,7 @@
 // Gemini API 클라이언트 설정 및 유틸리티 함수
 
 import { GoogleGenAI } from "@google/genai";
-import { GeminiConfig } from "./types";
+import { GeminiConfig } from "./ai-types";
 
 // Gemini API 클라이언트 초기화
 export const createGeminiClient = (): GoogleGenAI | null => {
