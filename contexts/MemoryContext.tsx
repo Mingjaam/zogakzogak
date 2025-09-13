@@ -52,73 +52,6 @@ const saveMemoriesToStorage = (memories: Memory[]): void => {
   }
 };
 
-// 더미 추억 데이터
-const dummyMemories: Memory[] = [
-  {
-    id: 'dummy-1',
-    title: "사랑하는 가족들과 함께한 시간",
-    description: "딸과 손자들과 함께한 즐거운 시간이었습니다.",
-    location: {
-      lat: 35.8714,
-      lng: 128.6014,
-      name: "대구 월성동",
-      address: "대구 월성동",
-      description: "가족과 함께한 특별한 장소"
-    },
-    imageUrl: "https://i.imgur.com/k2m3s4f.png",
-    date: "2024.05.05",
-    createdAt: "2024-05-05T00:00:00.000Z",
-    tags: ["가족", "행복"]
-  },
-  {
-    id: 'dummy-2',
-    title: "봄날의 산책",
-    description: "따뜻한 봄날 산책로를 걸으며 좋은 시간을 보냈습니다.",
-    location: {
-      lat: 35.8281,
-      lng: 128.6811,
-      name: "대구 수성못",
-      address: "대구 수성못",
-      description: "봄날 산책로"
-    },
-    imageUrl: "https://i.imgur.com/k2m3s4f.png",
-    date: "2024.04.15",
-    createdAt: "2024-04-15T00:00:00.000Z",
-    tags: ["산책", "봄"]
-  },
-  {
-    id: 'dummy-3',
-    title: "생일 축하 파티",
-    description: "65번째 생일을 가족들과 함께 축하했습니다.",
-    location: {
-      lat: 35.8714,
-      lng: 128.6014,
-      name: "집",
-      address: "집",
-      description: "가정집"
-    },
-    imageUrl: "https://i.imgur.com/k2m3s4f.png",
-    date: "2024.03.20",
-    createdAt: "2024-03-20T00:00:00.000Z",
-    tags: ["생일", "축하"]
-  },
-  {
-    id: 'dummy-4',
-    title: "손자와의 첫 만남",
-    description: "첫 손자를 안아보는 순간, 세상에서 가장 행복했습니다.",
-    location: {
-      lat: 35.8714,
-      lng: 128.6014,
-      name: "병원",
-      address: "병원",
-      description: "병원"
-    },
-    imageUrl: "https://i.imgur.com/k2m3s4f.png",
-    date: "2024.02.10",
-    createdAt: "2024-02-10T00:00:00.000Z",
-    tags: ["손자", "첫만남"]
-  }
-];
 
 interface MemoryProviderProps {
   children: ReactNode;
@@ -134,9 +67,8 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
 
   const loadMemories = () => {
     const loadedMemories = loadMemoriesFromStorage();
-    // 더미 데이터와 사용자 데이터 결합
-    const allMemories = [...loadedMemories, ...dummyMemories];
-    setMemories(allMemories);
+    // 사용자 데이터만 표시
+    setMemories(loadedMemories);
   };
 
   const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>) => {
@@ -148,9 +80,8 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
 
     setMemories(prev => {
       const updated = [newMemory, ...prev];
-      // 사용자 추억만 로컬 스토리지에 저장 (더미 데이터 제외)
-      const userMemories = updated.filter(m => !m.id.startsWith('dummy-'));
-      saveMemoriesToStorage(userMemories);
+      // 모든 추억을 로컬 스토리지에 저장
+      saveMemoriesToStorage(updated);
       return updated;
     });
   };
@@ -160,9 +91,8 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       const updated = prev.map(memory => 
         memory.id === id ? { ...memory, ...updates } : memory
       );
-      // 사용자 추억만 로컬 스토리지에 저장
-      const userMemories = updated.filter(m => !m.id.startsWith('dummy-'));
-      saveMemoriesToStorage(userMemories);
+      // 모든 추억을 로컬 스토리지에 저장
+      saveMemoriesToStorage(updated);
       return updated;
     });
   };
@@ -170,9 +100,8 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   const deleteMemory = (id: string) => {
     setMemories(prev => {
       const updated = prev.filter(memory => memory.id !== id);
-      // 사용자 추억만 로컬 스토리지에 저장
-      const userMemories = updated.filter(m => !m.id.startsWith('dummy-'));
-      saveMemoriesToStorage(userMemories);
+      // 모든 추억을 로컬 스토리지에 저장
+      saveMemoriesToStorage(updated);
       return updated;
     });
   };

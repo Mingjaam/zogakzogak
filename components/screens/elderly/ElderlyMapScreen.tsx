@@ -182,7 +182,7 @@ const ElderlyMapScreen: React.FC = () => {
     const { memories: allMemories, deleteMemory, addMemory } = useMemory();
     
     // 첫 번째 기억을 기본으로 선택
-    const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories[0] || null);
+    const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories.length > 0 ? allMemories[0] : null);
     const [currentMemoryIndex, setCurrentMemoryIndex] = useState(0);
     const [showAddMemory, setShowAddMemory] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
@@ -434,6 +434,27 @@ const ElderlyMapScreen: React.FC = () => {
                     onMemoryChange={handleMemoryChange}
                     onMemoryDelete={handleMemoryDelete}
                 />
+            )}
+
+            {/* 빈 상태 (추억이 없을 때) */}
+            {!selectedMemory && allMemories.length === 0 && !showAddMemory && (
+                <div className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+                    <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-2">아직 저장된 추억이 없습니다</h3>
+                        <p className="text-gray-500 mb-4">첫 번째 추억을 추가해보세요!</p>
+                        <button
+                            onClick={handleAddMemory}
+                            className="px-6 py-3 bg-[#70c18c] text-white rounded-full font-medium hover:bg-[#5aa876] transition-colors"
+                        >
+                            추억 추가하기
+                        </button>
+                    </div>
+                </div>
             )}
 
             {/* Add Memory Modal */}

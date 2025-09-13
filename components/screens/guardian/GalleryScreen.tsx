@@ -140,7 +140,24 @@ const GalleryScreen: React.FC = () => {
 
             {/* 추억 리스트 */}
             <div className="space-y-4">
-                {memories.map((memory) => (
+                {memories.length === 0 ? (
+                    <div className="text-center py-12">
+                        <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-2">아직 저장된 추억이 없습니다</h3>
+                        <p className="text-gray-500 mb-4">첫 번째 추억을 추가해보세요!</p>
+                        <button
+                            onClick={handleAddMemory}
+                            className="px-6 py-3 bg-[#70c18c] text-white rounded-full font-medium hover:bg-[#5aa876] transition-colors"
+                        >
+                            추억 추가하기
+                        </button>
+                    </div>
+                ) : (
+                    memories.map((memory) => (
                     <div key={memory.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                         <div className="flex">
                             {/* 이미지 */}
@@ -183,21 +200,9 @@ const GalleryScreen: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                ))}
+                    ))
+                )}
             </div>
-
-            {/* 빈 상태 (데이터가 없을 때) */}
-            {memories.length === 0 && (
-                <div className="text-center py-12">
-                    <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-500 mb-2">아직 추억이 없습니다</h3>
-                    <p className="text-sm text-gray-400">새로운 추억을 만들어보세요</p>
-                </div>
-            )}
 
             {/* Add Memory Modal */}
             {showAddMemory && (
