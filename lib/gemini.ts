@@ -197,6 +197,9 @@ export const analyzeEmotionScores = async (diaryText: string): Promise<{scores: 
         const response = await ai.models.generateContent({
             model: model,
             contents: { parts: [{ text: prompt }] },
+        }).catch((error) => {
+            console.error('Gemini API 호출 실패:', error);
+            throw new Error(`API 호출 실패: ${error.message}`);
         });
 
         const text = response.text?.trim() || '';
