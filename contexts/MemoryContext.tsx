@@ -219,7 +219,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     
     const newMemory: Memory = {
       ...memory,
-      id: Date.now().toString(),
+      id: `memory_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       createdAt: new Date().toISOString(),
       tags: memory.tags || [], // tags가 없으면 빈 배열로 설정
     };
@@ -228,31 +228,25 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     
     setMemories(prev => {
       console.log("📝 Previous memories count:", prev.length);
+      
+      // 중복 체크 (같은 ID가 이미 있는지 확인)
+      const existingMemory = prev.find(m => m.id === newMemory.id);
+      if (existingMemory) {
+        console.warn("⚠️ 중복된 추억 ID 발견, 추가를 건너뜁니다:", newMemory.id);
+        return prev;
+      }
+      
       const updated = [newMemory, ...prev];
       console.log("📝 Updated memories count:", updated.length);
       
+      // 로컬 스토리지에 저장
       try {
         saveMemoriesToStorage(updated);
         console.log("✅ Memories saved to storage successfully");
-        
-        // 저장 후 즉시 로드해서 확인
-        const verifyMemories = loadMemoriesFromStorage();
-        console.log("🔍 저장 후 검증 - 로드된 추억 개수:", verifyMemories.length);
-        
-        // 저장이 성공했으면 상태도 업데이트
-        if (verifyMemories.length > 0) {
-          setMemories(verifyMemories);
-        }
-        
-        // 용량 초과로 인한 정리 알림
-        if (verifyMemories.length < updated.length) {
-          const cleanedCount = updated.length - verifyMemories.length;
-          console.warn(`⚠️ 저장소 용량 부족으로 ${cleanedCount}개의 오래된 추억이 정리되었습니다.`);
-          alert(`저장소 용량이 부족하여 ${cleanedCount}개의 오래된 추억이 자동으로 정리되었습니다.`);
-        }
       } catch (error) {
         console.error("❌ Error saving to storage:", error);
         alert("추억 저장 중 오류가 발생했습니다. 저장소 용량을 확인해주세요.");
+        return prev; // 저장 실패 시 이전 상태 유지
       }
       
       return updated;
@@ -270,9 +264,21 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   };
 
   const deleteMemory = (id: string) => {
+    console.log("🗑️ deleteMemory called with id:", id);
+    
     setMemories(prev => {
+      console.log("📝 Previous memories count:", prev.length);
       const updated = prev.filter(memory => memory.id !== id);
-      saveMemoriesToStorage(updated);
+      console.log("📝 After deletion count:", updated.length);
+      
+      try {
+        saveMemoriesToStorage(updated);
+        console.log("✅ Memory deleted and saved to storage");
+      } catch (error) {
+        console.error("❌ Error saving after deletion:", error);
+        return prev; // 삭제 실패 시 이전 상태 유지
+      }
+      
       return updated;
     });
   };
