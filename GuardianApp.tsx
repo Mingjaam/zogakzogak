@@ -66,6 +66,8 @@ const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
                 title={getHeaderTitle()} 
                 onTitleClick={onHeaderClick}
                 onNotificationClick={() => setShowNotifications(true)}
+                currentRole="guardian"
+                onRoleSwitch={onHeaderClick}
             />
             <main className="flex-grow overflow-y-auto pb-20">
                 {renderContent()}

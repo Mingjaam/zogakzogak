@@ -11,7 +11,7 @@ interface RegisterData {
     email: string;
     password: string;
     number: string;
-    role: 'SENIOR' | 'GUARDIAN';
+    // role 제거 - 로그인 후 선택하도록 변경
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
@@ -20,8 +20,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
         name: '',
         email: '',
         password: '',
-        number: '',
-        role: 'SENIOR'
+        number: ''
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -42,8 +41,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
             name: '',
             email: '',
             password: '',
-            number: '',
-            role: 'SENIOR'
+            number: ''
         });
     };
 
@@ -193,43 +191,6 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                     />
                                 </div>
                                 
-                                <div className="space-y-3">
-                                    <p className="text-sm font-medium text-gray-700">역할 선택</p>
-                                    <div className="flex gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleInputChange('role', 'SENIOR')}
-                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
-                                                registerData.role === 'SENIOR'
-                                                    ? 'bg-white text-gray-700 border-2 border-[#70c18c]'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
-                                            }`}
-                                        >
-                                            <img 
-                                                src="https://i.imgur.com/cZe1BTZ.png" 
-                                                alt="어르신" 
-                                                className="w-8 h-8 object-contain" 
-                                            />
-                                            어르신
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleInputChange('role', 'GUARDIAN')}
-                                            className={`flex-1 py-4 px-6 rounded-full font-semibold text-sm transition-all duration-200 flex flex-col items-center gap-2 ${
-                                                registerData.role === 'GUARDIAN'
-                                                    ? 'bg-white text-gray-700 border-2 border-[#70c18c]'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
-                                            }`}
-                                        >
-                                            <img 
-                                                src="https://i.imgur.com/RjrEbYa.png" 
-                                                alt="보호자" 
-                                                className="w-8 h-8 object-contain" 
-                                            />
-                                            보호자
-                                        </button>
-                                    </div>
-                                </div>
 
                                 <div className="flex gap-3">
                                     <button

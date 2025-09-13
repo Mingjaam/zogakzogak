@@ -74,3 +74,4 @@ const EmotionCharacter: React.FC<EmotionCharacterProps> = ({
 
 export default EmotionCharacter;
 
+

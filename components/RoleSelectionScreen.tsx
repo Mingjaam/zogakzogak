@@ -32,7 +32,8 @@ const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onSelectRole 
             </header>
             <div className="flex-grow flex flex-col items-center justify-center p-4 -mt-12">
                 <div className="w-full max-w-xs mx-auto text-center">
-                    <h2 className="text-xl font-semibold text-gray-600 mb-8">둘 중에 선택해주세요</h2>
+                    <h2 className="text-xl font-semibold text-gray-600 mb-4">역할을 선택해주세요</h2>
+                    <p className="text-sm text-gray-500 mb-8">언제든지 다른 역할로 전환할 수 있습니다</p>
                     <div className="grid grid-cols-2 gap-5">
                         <RoleCard
                             imageUrl="https://i.imgur.com/RjrEbYa.png"
