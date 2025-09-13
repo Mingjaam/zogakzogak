@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { Memory } from '../../../types/memory';
 import { useMemory } from '../../../contexts/MemoryContext';
@@ -168,6 +168,17 @@ const ElderlyMapScreen: React.FC = () => {
     // 첫 번째 기억을 기본으로 선택
     const [selectedMemory, setSelectedMemory] = useState<Memory | null>(allMemories.length > 0 ? allMemories[0] : null);
     const [currentMemoryIndex, setCurrentMemoryIndex] = useState(0);
+    
+    // 추억 데이터 로딩 상태 로그
+    useEffect(() => {
+        console.log('🗺️ ElderlyMapScreen - 로드된 추억 개수:', allMemories.length);
+        console.log('🗺️ ElderlyMapScreen - 추억 데이터:', allMemories);
+        
+        if (allMemories.length > 0 && !selectedMemory) {
+            console.log('🗺️ 첫 번째 추억 선택:', allMemories[0]);
+            setSelectedMemory(allMemories[0]);
+        }
+    }, [allMemories, selectedMemory]);
     const [showAddMemory, setShowAddMemory] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const [showLocationPicker, setShowLocationPicker] = useState(false);
