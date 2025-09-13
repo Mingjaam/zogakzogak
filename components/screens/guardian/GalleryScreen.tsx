@@ -109,11 +109,33 @@ const GalleryScreen: React.FC = () => {
 
     const saveMemoryToLocalStorage = (memoryData: any) => {
         try {
+            console.log('💾 보호자 갤러리 - 로컬 스토리지에 추억 저장:', memoryData);
+            
+            // 기존 추억 데이터 가져오기
+            const existingMemories = JSON.parse(localStorage.getItem('userMemories') || '[]');
+            console.log('📂 기존 추억 개수:', existingMemories.length);
+            
+            // 새 추억 추가
+            const newMemory = {
+                ...memoryData,
+                id: `memory_${Date.now()}`,
+                createdAt: new Date().toISOString(),
+            };
+            
+            const updatedMemories = [newMemory, ...existingMemories];
+            console.log('📝 업데이트된 추억 개수:', updatedMemories.length);
+            
+            // 로컬 스토리지에 저장
+            localStorage.setItem('userMemories', JSON.stringify(updatedMemories));
+            console.log('✅ 로컬 스토리지 저장 완료');
+            
+            // MemoryContext도 업데이트
             addMemory(memoryData);
-            return true;
+            
+            return newMemory;
         } catch (error) {
-            console.error('추억 저장 실패:', error);
-            return false;
+            console.error('❌ 로컬 스토리지 저장 실패:', error);
+            return null;
         }
     };
 
