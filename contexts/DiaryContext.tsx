@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { EmotionType, EmotionScores } from '../lib/gemini';
+import { EmotionType, EmotionScores } from '../lib/ai';
 
 export interface DiaryEntry {
   id: string;

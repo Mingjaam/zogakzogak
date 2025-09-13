@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import useLocalStorage from '../../../hooks/useLocalStorage';
-import { identifyPerson, Person, detectFace } from '../../../lib/gemini';
+import { identifyPerson, Person, detectFace } from '../../../lib/ai';
 import CameraMagnifierIcon from '../../icons/CameraMagnifierIcon';
 import AlbumIcon from '../../icons/AlbumIcon';
 import CameraView from '../../CameraView';

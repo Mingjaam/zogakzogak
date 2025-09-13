@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EmotionType, EmotionScores } from '../../../lib/gemini';
+import { EmotionType, EmotionScores } from '../../../lib/ai';
 import EmotionCharacter from '../../icons/EmotionCharacter';
 import EmotionChart from '../../EmotionChart';
 import { useDiary } from '../../../contexts/DiaryContext';

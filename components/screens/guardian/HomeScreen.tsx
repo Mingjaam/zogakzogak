@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
 import { useSafeZone } from '../../../contexts/SafeZoneContext';
 import { useDiary } from '../../../contexts/DiaryContext';
-import { EmotionType } from '../../../lib/gemini';
+import { EmotionType } from '../../../lib/ai';
 import PhoneIcon from '../../icons/PhoneIcon';
 import LocationPinIcon from '../../icons/LocationPinIcon';
 import PillIcon from '../../icons/PillIcon';

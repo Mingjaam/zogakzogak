@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmotionScores, EmotionType } from '../lib/gemini';
+import { EmotionScores, EmotionType } from '../lib/ai';
 
 interface EmotionChartProps {
   scores: EmotionScores;
