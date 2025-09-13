@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 export interface Memory {
   id: string;
@@ -74,8 +74,37 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
 
   // 컴포넌트 마운트 시 로컬 스토리지에서 데이터 로드
   useEffect(() => {
+    console.log("🚀 MemoryProvider 마운트 - 데이터 로드 시작");
     const loadedMemories = loadMemoriesFromStorage();
+    console.log("📊 초기 로드된 추억 개수:", loadedMemories.length);
     setMemories(loadedMemories);
+  }, []);
+
+  // 페이지 포커스 시 데이터 새로고침 (역할 전환 시 중요)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log("🔄 페이지 포커스 - 추억 데이터 새로고침");
+      const loadedMemories = loadMemoriesFromStorage();
+      console.log("📊 포커스 후 로드된 추억 개수:", loadedMemories.length);
+      setMemories(loadedMemories);
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("🔄 페이지 가시성 변경 - 추억 데이터 새로고침");
+        const loadedMemories = loadMemoriesFromStorage();
+        console.log("📊 가시성 변경 후 로드된 추억 개수:", loadedMemories.length);
+        setMemories(loadedMemories);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>) => {
@@ -139,12 +168,12 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     });
   };
 
-  const loadMemories = () => {
+  const loadMemories = useCallback(() => {
     console.log("🔄 loadMemories 호출됨");
     const loadedMemories = loadMemoriesFromStorage();
     console.log("📊 로드된 추억 개수:", loadedMemories.length);
     setMemories(loadedMemories);
-  };
+  }, []);
 
   return (
     <MemoryContext.Provider value={{ memories, addMemory, updateMemory, deleteMemory, loadMemories }}>

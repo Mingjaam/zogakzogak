@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ElderlyHomeScreen from './components/screens/elderly/ElderlyHomeScreen';
 import ElderlyGalleryScreen from './components/screens/elderly/ElderlyGalleryScreen';
 import ElderlyMapScreen from './components/screens/elderly/ElderlyMapScreen';
@@ -8,6 +8,7 @@ import UnifiedProfileScreen from './components/screens/UnifiedProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
 import MedicationReminderModal from './components/modals/MedicationReminderModal';
+import { useMemory } from './contexts/MemoryContext';
 
 export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
@@ -19,6 +20,13 @@ const ElderlyApp: React.FC<ElderlyAppProps> = ({ onHeaderClick }) => {
     const [activeTab, setActiveTab] = useState<TabName>('home');
     const [showMedicationModal, setShowMedicationModal] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const { loadMemories } = useMemory();
+
+    // 어르신 앱 마운트 시 데이터 새로고침
+    useEffect(() => {
+        console.log("🔄 어르신 앱 마운트 - 추억 데이터 새로고침");
+        loadMemories();
+    }, [loadMemories]);
 
     const renderContent = () => {
         if (showNotifications) {

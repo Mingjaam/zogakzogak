@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HomeScreen from './components/screens/guardian/HomeScreen';
 import MapScreen from './components/screens/guardian/MapScreen';
 import NotificationsScreen from './components/screens/guardian/NotificationsScreen';
@@ -7,6 +7,7 @@ import GalleryScreen from './components/screens/guardian/GalleryScreen';
 import UnifiedProfileScreen from './components/screens/UnifiedProfileScreen';
 import BottomNavBar from './components/BottomNavBar';
 import AppHeader from './components/AppHeader';
+import { useMemory } from './contexts/MemoryContext';
 
 export type TabName = 'home' | 'gallery' | 'map' | 'diary' | 'profile';
 
@@ -17,6 +18,13 @@ interface GuardianAppProps {
 const GuardianApp: React.FC<GuardianAppProps> = ({ onHeaderClick }) => {
     const [activeTab, setActiveTab] = useState<TabName>('home');
     const [showNotifications, setShowNotifications] = useState(false);
+    const { loadMemories } = useMemory();
+
+    // 보호자 앱 마운트 시 데이터 새로고침
+    useEffect(() => {
+        console.log("🔄 보호자 앱 마운트 - 추억 데이터 새로고침");
+        loadMemories();
+    }, [loadMemories]);
 
     const renderContent = () => {
         if (showNotifications) {

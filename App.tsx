@@ -26,10 +26,12 @@ const App: React.FC = () => {
     };
     
     const handleRoleSelect = (selectedRole: 'guardian' | 'elderly') => {
+        console.log("🔄 역할 선택:", selectedRole);
         setRole(selectedRole);
     };
 
     const handleRoleReset = () => {
+        console.log("🔄 역할 리셋");
         setRole(null);
     };
 
