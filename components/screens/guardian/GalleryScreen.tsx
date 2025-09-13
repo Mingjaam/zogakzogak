@@ -378,18 +378,36 @@ const GalleryScreen: React.FC = () => {
                                             return;
                                         }
                                         
-                                        // 이미지를 Base64로 변환
+                                        // 이미지 압축 후 Base64로 변환
                                         const imageData = await new Promise<string>((resolve, reject) => {
-                                            const reader = new FileReader();
-                                            reader.onload = (e) => {
-                                                if (e.target?.result) {
-                                                    resolve(e.target.result as string);
-                                                } else {
-                                                    reject(new Error('이미지 읽기 실패'));
+                                            const canvas = document.createElement('canvas');
+                                            const ctx = canvas.getContext('2d');
+                                            const img = new Image();
+                                            
+                                            img.onload = () => {
+                                                // 이미지 크기 계산 (최대 800px, 비율 유지)
+                                                let { width, height } = img;
+                                                const maxWidth = 800;
+                                                const quality = 0.7;
+                                                
+                                                if (width > maxWidth) {
+                                                    height = (height * maxWidth) / width;
+                                                    width = maxWidth;
                                                 }
+                                                
+                                                canvas.width = width;
+                                                canvas.height = height;
+                                                
+                                                // 이미지 그리기
+                                                ctx?.drawImage(img, 0, 0, width, height);
+                                                
+                                                // 압축된 이미지를 Base64로 변환
+                                                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                                                resolve(compressedDataUrl);
                                             };
-                                            reader.onerror = () => reject(new Error('이미지 읽기 오류'));
-                                            reader.readAsDataURL(selectedImage);
+                                            
+                                            img.onerror = () => reject(new Error('이미지 로드 실패'));
+                                            img.src = URL.createObjectURL(selectedImage);
                                         });
                                         
                                         // 추억 데이터 생성

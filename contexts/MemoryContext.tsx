@@ -42,9 +42,65 @@ interface MemoryProviderProps {
 }
 
 const STORAGE_KEY = 'zogakzogak_memories';
+const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB 제한
 
 // 빈 배열로 시작
 const defaultMemories: Memory[] = [];
+
+// 이미지 압축 함수
+const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.7): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // 이미지 크기 계산 (비율 유지)
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // 이미지 그리기
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // 압축된 이미지를 Base64로 변환
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedDataUrl);
+    };
+    
+    img.onerror = () => reject(new Error('이미지 로드 실패'));
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+// 로컬 스토리지 용량 체크
+const checkStorageQuota = (): boolean => {
+  try {
+    const testKey = 'storage_test';
+    const testData = 'x'.repeat(1024); // 1KB 테스트 데이터
+    
+    localStorage.setItem(testKey, testData);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+// 오래된 추억 정리 (용량 절약)
+const cleanupOldMemories = (memories: Memory[]): Memory[] => {
+  // 최신 50개만 유지
+  const sortedMemories = memories.sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  
+  return sortedMemories.slice(0, 50);
+};
 
 // 로컬 스토리지에서 추억 데이터 로드
 const loadMemoriesFromStorage = (): Memory[] => {
@@ -63,9 +119,54 @@ const loadMemoriesFromStorage = (): Memory[] => {
 // 로컬 스토리지에 추억 데이터 저장
 const saveMemoriesToStorage = (memories: Memory[]) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(memories));
+    // 용량 체크
+    if (!checkStorageQuota()) {
+      console.warn('⚠️ 로컬 스토리지 용량 부족 - 오래된 추억 정리 중...');
+      const cleanedMemories = cleanupOldMemories(memories);
+      console.log(`🧹 정리 전: ${memories.length}개, 정리 후: ${cleanedMemories.length}개`);
+      
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedMemories));
+        console.log('✅ 정리 후 저장 성공');
+        return;
+      } catch (error) {
+        console.error('❌ 정리 후에도 저장 실패:', error);
+        // 최후의 수단: 모든 데이터 삭제
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('🗑️ 모든 추억 데이터 삭제됨');
+        return;
+      }
+    }
+    
+    const dataToStore = JSON.stringify(memories);
+    const dataSize = new Blob([dataToStore]).size;
+    
+    if (dataSize > MAX_STORAGE_SIZE) {
+      console.warn(`⚠️ 데이터 크기 초과: ${(dataSize / 1024 / 1024).toFixed(2)}MB`);
+      const cleanedMemories = cleanupOldMemories(memories);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedMemories));
+      console.log('🧹 오래된 추억 정리 후 저장 완료');
+    } else {
+      localStorage.setItem(STORAGE_KEY, dataToStore);
+      console.log(`✅ 저장 완료: ${(dataSize / 1024).toFixed(2)}KB`);
+    }
   } catch (error) {
     console.error('로컬 스토리지에 추억 데이터를 저장하는 중 오류:', error);
+    
+    // QuotaExceededError 처리
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('⚠️ 저장소 용량 초과 - 오래된 추억 정리 중...');
+      const cleanedMemories = cleanupOldMemories(memories);
+      
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedMemories));
+        console.log('✅ 정리 후 저장 성공');
+      } catch (retryError) {
+        console.error('❌ 정리 후에도 저장 실패:', retryError);
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('🗑️ 모든 추억 데이터 삭제됨');
+      }
+    }
   }
 };
 
@@ -142,8 +243,16 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
         if (verifyMemories.length > 0) {
           setMemories(verifyMemories);
         }
+        
+        // 용량 초과로 인한 정리 알림
+        if (verifyMemories.length < updated.length) {
+          const cleanedCount = updated.length - verifyMemories.length;
+          console.warn(`⚠️ 저장소 용량 부족으로 ${cleanedCount}개의 오래된 추억이 정리되었습니다.`);
+          alert(`저장소 용량이 부족하여 ${cleanedCount}개의 오래된 추억이 자동으로 정리되었습니다.`);
+        }
       } catch (error) {
         console.error("❌ Error saving to storage:", error);
+        alert("추억 저장 중 오류가 발생했습니다. 저장소 용량을 확인해주세요.");
       }
       
       return updated;
