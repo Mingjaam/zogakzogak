@@ -132,7 +132,7 @@ const DiaryScreen: React.FC<DiaryScreenProps> = () => {
             </div>
           ) : (
             diaryEntries.map((entry) => (
-            <div
+              <div
               key={entry.id}
               className={`w-full p-4 rounded-2xl shadow-lg border transition-all ${
                 selectedEntry?.id === entry.id 
