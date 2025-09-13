@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import GoogleMap from '../../GoogleMap';
-import { Memory, dummyMemories } from '../../../types/memory';
+import { Memory } from '../../../types/memory';
 import SafeZoneModal from '../../modals/SafeZoneModal';
 import { useSafeZone } from '../../../contexts/SafeZoneContext';
 import LocationPinIcon from '../../icons/LocationPinIcon';
@@ -89,7 +89,7 @@ const MapScreen: React.FC = () => {
                     center={{ lat: 35.8714, lng: 128.6014 }}
                     zoom={15}
                     className="w-full h-full"
-                    memories={dummyMemories}
+                    memories={[]}
                     onMemoryClick={handleMemoryClick}
                     selectedMemoryId={selectedMemory?.id}
                     onMapLoad={handleMapLoad}

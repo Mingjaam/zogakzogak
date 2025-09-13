@@ -678,7 +678,7 @@ const ElderlyMapScreen: React.FC = () => {
                                             // 상태 업데이트로 새로운 추억 반영 (페이지 새로고침 대신)
                                             const updatedMemories = [...userMemories, savedMemory];
                                             setUserMemories(updatedMemories);
-                                            setAllMemories([...updatedMemories, ...dummyMemories]);
+                                            setAllMemories(updatedMemories);
                                             
                                             alert('추억이 추가되었습니다!');
                                             handleCloseAddMemory();
