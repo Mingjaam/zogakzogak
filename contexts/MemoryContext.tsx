@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 export interface Memory {
   id: string;
@@ -134,11 +134,20 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const loadMemories = useCallback(() => {
+    console.log('📂 추억 데이터 로드 함수 호출');
+    const loadedMemories = loadMemoriesFromStorage();
+    console.log('📊 로드된 추억 개수:', loadedMemories.length);
+    
+    setMemories(loadedMemories);
+    setIsLoaded(true);
+  }, []);
+
   // 컴포넌트 마운트 시 로컬 스토리지에서 데이터 로드
   useEffect(() => {
     console.log('🚀 MemoryProvider 마운트됨, 추억 데이터 로드 시작');
     loadMemories();
-  }, []);
+  }, [loadMemories]);
 
   // 앱이 포커스를 받을 때마다 데이터 새로고침 (PWA에서 중요)
   useEffect(() => {
@@ -174,7 +183,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
         window.removeEventListener('load', handleLoad);
       }
     };
-  }, []);
+  }, [loadMemories]);
 
   // 주기적으로 데이터 동기화 (PWA에서 중요) - 빈도 줄임
   useEffect(() => {
@@ -184,18 +193,9 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     }, 30000); // 30초마다 동기화 (성능 개선)
 
     return () => clearInterval(interval);
-  }, []);
+  }, [loadMemories]);
 
-  const loadMemories = () => {
-    console.log('📂 추억 데이터 로드 함수 호출');
-    const loadedMemories = loadMemoriesFromStorage();
-    console.log('📊 로드된 추억 개수:', loadedMemories.length);
-    
-    setMemories(loadedMemories);
-    setIsLoaded(true);
-  };
-
-  const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>) => {
+  const addMemory = useCallback((memory: Omit<Memory, 'id' | 'createdAt'>) => {
     console.log('➕ MemoryContext - 새 추억 추가:', memory);
     
     const newMemory: Memory = {
@@ -214,15 +214,15 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       saveMemoriesToStorage(updated);
       return updated;
     });
-  };
+  }, []);
 
   // 로컬 스토리지에서 직접 로드하는 함수 (외부에서 호출 가능)
-  const loadMemoriesFromLocalStorage = () => {
+  const loadMemoriesFromLocalStorage = useCallback(() => {
     console.log('🔄 MemoryContext - 외부에서 로드 요청');
     loadMemories();
-  };
+  }, [loadMemories]);
 
-  const updateMemory = (id: string, updates: Partial<Memory>) => {
+  const updateMemory = useCallback((id: string, updates: Partial<Memory>) => {
     setMemories(prev => {
       const updated = prev.map(memory => 
         memory.id === id ? { ...memory, ...updates } : memory
@@ -231,16 +231,16 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       saveMemoriesToStorage(updated);
       return updated;
     });
-  };
+  }, []);
 
-  const deleteMemory = (id: string) => {
+  const deleteMemory = useCallback((id: string) => {
     setMemories(prev => {
       const updated = prev.filter(memory => memory.id !== id);
       // 모든 추억을 로컬 스토리지에 저장
       saveMemoriesToStorage(updated);
       return updated;
     });
-  };
+  }, []);
 
   return (
     <MemoryContext.Provider value={{ memories, addMemory, updateMemory, deleteMemory, loadMemories: loadMemoriesFromLocalStorage }}>
