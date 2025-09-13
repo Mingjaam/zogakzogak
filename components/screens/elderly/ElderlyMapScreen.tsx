@@ -193,35 +193,6 @@ const ElderlyMapScreen: React.FC = () => {
     const locationMapRef = useRef<google.maps.Map | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 로컬 스토리지에 추억 저장 함수
-    const saveMemoryToLocalStorage = (memoryData: any) => {
-        try {
-            console.log('💾 로컬 스토리지에 추억 저장:', memoryData);
-            
-            // 기존 추억 데이터 가져오기
-            const existingMemories = JSON.parse(localStorage.getItem('userMemories') || '[]');
-            console.log('📂 기존 추억 개수:', existingMemories.length);
-            
-            // 새 추억 추가
-            const newMemory = {
-                ...memoryData,
-                id: `memory_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-            };
-            
-            const updatedMemories = [newMemory, ...existingMemories];
-            console.log('📝 업데이트된 추억 개수:', updatedMemories.length);
-            
-            // 로컬 스토리지에 저장
-            localStorage.setItem('userMemories', JSON.stringify(updatedMemories));
-            console.log('✅ 로컬 스토리지 저장 완료');
-            
-            return newMemory;
-        } catch (error) {
-            console.error('❌ 로컬 스토리지 저장 실패:', error);
-            return null;
-        }
-    };
 
     const handleMemoryClick = (memory: Memory) => {
         const index = allMemories.findIndex(m => m.id === memory.id);
@@ -696,18 +667,11 @@ const ElderlyMapScreen: React.FC = () => {
                                             imageSize: selectedImage.size
                                         };
                                         
-                                        // 로컬 스토리지에 직접 저장
-                                        const savedMemory = saveMemoryToLocalStorage(memoryData);
+                                        // MemoryContext를 통해서만 저장 (로컬 스토리지 자동 처리)
+                                        addMemory(memoryData);
                                         
-                                        if (savedMemory) {
-                                            // MemoryContext도 업데이트
-                                            addMemory(memoryData);
-                                            
-                                            alert('추억이 추가되었습니다!');
-                                            handleCloseAddMemory();
-                                        } else {
-                                            alert('저장 중 오류가 발생했습니다.');
-                                        }
+                                        alert('추억이 추가되었습니다!');
+                                        handleCloseAddMemory();
                                     } catch (error) {
                                         console.error('추억 추가 오류:', error);
                                         alert('추억 추가 중 오류가 발생했습니다. 다시 시도해주세요.');

@@ -107,37 +107,6 @@ const GalleryScreen: React.FC = () => {
         setShowLocationPicker(false);
     };
 
-    const saveMemoryToLocalStorage = (memoryData: any) => {
-        try {
-            console.log('💾 보호자 갤러리 - 로컬 스토리지에 추억 저장:', memoryData);
-            
-            // 기존 추억 데이터 가져오기
-            const existingMemories = JSON.parse(localStorage.getItem('userMemories') || '[]');
-            console.log('📂 기존 추억 개수:', existingMemories.length);
-            
-            // 새 추억 추가
-            const newMemory = {
-                ...memoryData,
-                id: `memory_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-            };
-            
-            const updatedMemories = [newMemory, ...existingMemories];
-            console.log('📝 업데이트된 추억 개수:', updatedMemories.length);
-            
-            // 로컬 스토리지에 저장
-            localStorage.setItem('userMemories', JSON.stringify(updatedMemories));
-            console.log('✅ 로컬 스토리지 저장 완료');
-            
-            // MemoryContext도 업데이트
-            addMemory(memoryData);
-            
-            return newMemory;
-        } catch (error) {
-            console.error('❌ 로컬 스토리지 저장 실패:', error);
-            return null;
-        }
-    };
 
     return (
         <div className="p-4">
@@ -425,16 +394,24 @@ const GalleryScreen: React.FC = () => {
                                         
                                         // 추억 데이터 생성
                                         const memoryData = {
-                                            id: Date.now(),
                                             title: memoryTitle,
                                             description: memoryDescription,
                                             date: memoryDate || new Date().toISOString().split('T')[0],
-                                            location: selectedLocation.address,
-                                            imageUrl: imageData
+                                            location: {
+                                                lat: selectedLocation.lat,
+                                                lng: selectedLocation.lng,
+                                                name: selectedLocation.address,
+                                                address: selectedLocation.address,
+                                                description: locationDescription
+                                            },
+                                            imageUrl: imageData,
+                                            imageName: selectedImage.name,
+                                            imageSize: selectedImage.size,
+                                            tags: []
                                         };
                                         
-                                        // 상태 업데이트로 새로운 추억 반영 (페이지 새로고침 대신)
-                                        setMemories(prevMemories => [...prevMemories, memoryData]);
+                                        // MemoryContext를 통해서만 저장 (로컬 스토리지 자동 처리)
+                                        addMemory(memoryData);
                                         
                                         alert('추억이 추가되었습니다!');
                                         handleCloseAddMemory();

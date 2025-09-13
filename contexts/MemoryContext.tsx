@@ -82,6 +82,29 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
     loadMemories();
   }, []);
 
+  // 앱이 포커스를 받을 때마다 데이터 새로고침 (PWA에서 중요)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('🔄 앱 포커스 - 추억 데이터 새로고침');
+      loadMemories();
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('🔄 앱 가시성 변경 - 추억 데이터 새로고침');
+        loadMemories();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const loadMemories = () => {
     console.log('📂 추억 데이터 로드 함수 호출');
     const loadedMemories = loadMemoriesFromStorage();
@@ -91,7 +114,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   };
 
   const addMemory = (memory: Omit<Memory, 'id' | 'createdAt'>) => {
-    console.log('➕ 새 추억 추가:', memory);
+    console.log('➕ MemoryContext - 새 추억 추가:', memory);
     
     const newMemory: Memory = {
       ...memory,
@@ -99,15 +122,21 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log('🆕 생성된 새 추억:', newMemory);
+    console.log('🆕 MemoryContext - 생성된 새 추억:', newMemory);
 
     setMemories(prev => {
       const updated = [newMemory, ...prev];
-      console.log('📝 업데이트된 추억 목록:', updated.length, '개');
+      console.log('📝 MemoryContext - 업데이트된 추억 목록:', updated.length, '개');
       // 모든 추억을 로컬 스토리지에 저장
       saveMemoriesToStorage(updated);
       return updated;
     });
+  };
+
+  // 로컬 스토리지에서 직접 로드하는 함수 (외부에서 호출 가능)
+  const loadMemoriesFromLocalStorage = () => {
+    console.log('🔄 MemoryContext - 외부에서 로드 요청');
+    loadMemories();
   };
 
   const updateMemory = (id: string, updates: Partial<Memory>) => {
@@ -131,7 +160,7 @@ export const MemoryProvider: React.FC<MemoryProviderProps> = ({ children }) => {
   };
 
   return (
-    <MemoryContext.Provider value={{ memories, addMemory, updateMemory, deleteMemory, loadMemories }}>
+    <MemoryContext.Provider value={{ memories, addMemory, updateMemory, deleteMemory, loadMemories: loadMemoriesFromLocalStorage }}>
       {children}
     </MemoryContext.Provider>
   );
