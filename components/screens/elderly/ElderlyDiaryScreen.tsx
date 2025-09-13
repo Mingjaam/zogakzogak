@@ -15,6 +15,7 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<{emotion: EmotionType, scores: EmotionScores} | null>(null);
+  const [showAllDiaries, setShowAllDiaries] = useState(false);
   
   // 어르신이 작성한 일기만 필터링 (최신순)
   const recentDiaries = diaries.filter(diary => diary.author === 'elderly').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -169,18 +170,43 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">최근 일기</h3>
-              <button className="text-green-600 text-sm font-medium hover:text-green-700 transition-colors">
-                일기 보기
+              <button 
+                onClick={() => setShowAllDiaries(!showAllDiaries)}
+                className="text-green-600 text-sm font-medium hover:text-green-700 transition-colors"
+              >
+                {showAllDiaries ? '일기 접기' : '전체일기보기'}
               </button>
             </div>
             <div className="space-y-3">
-              {recentDiaries.slice(0, 3).map((diary) => (
+              {(showAllDiaries ? recentDiaries : recentDiaries.slice(0, 3)).map((diary) => (
                 <div key={diary.id} className="bg-gray-50 rounded-xl p-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-start gap-3">
                     <EmotionCharacter emotion={diary.emotion} size="sm" />
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800">{diary.date}</p>
-                      <p className="text-sm text-gray-600 line-clamp-2">{diary.content}</p>
+                      <p className="font-medium text-gray-800 mb-2">{diary.date}</p>
+                      <p className={`text-sm text-gray-600 ${showAllDiaries ? 'whitespace-pre-wrap' : 'line-clamp-2'}`}>
+                        {diary.content}
+                      </p>
+                      {showAllDiaries && (
+                        <div className="mt-3 flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-gray-500">감정:</span>
+                            <span className="text-xs font-medium text-gray-700">
+                              {diary.emotion === 'joy' ? '기뻐요' : 
+                               diary.emotion === 'happiness' ? '행복함' :
+                               diary.emotion === 'surprise' ? '놀라움' :
+                               diary.emotion === 'sadness' ? '슬퍼요' :
+                               diary.emotion === 'anger' ? '화나요' : '두려워요'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-gray-500">점수:</span>
+                            <span className="text-xs font-medium text-gray-700">
+                              {diary.emotionScores[diary.emotion]}%
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleDeleteDiary(diary.id)}
@@ -194,6 +220,18 @@ const ElderlyDiaryScreen: React.FC<ElderlyDiaryScreenProps> = () => {
                   </div>
                 </div>
               ))}
+              
+              {recentDiaries.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="text-gray-400 mb-2">
+                    <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-sm">아직 작성된 일기가 없습니다</p>
+                  <p className="text-gray-400 text-xs mt-1">첫 번째 일기를 작성해보세요!</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
