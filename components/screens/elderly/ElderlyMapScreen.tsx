@@ -100,7 +100,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
 
     return (
         <div 
-            className="bg-white p-5 rounded-t-3xl shadow-[0_-8px_25px_rgba(0,0,0,0.15)] border-t border-gray-100 text-center relative -mt-8 z-10"
+            className="bg-white p-4 rounded-t-3xl shadow-[0_-8px_25px_rgba(0,0,0,0.15)] border-t border-gray-100 text-center relative -mt-8 z-10"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -111,66 +111,50 @@ const MemoryCard: React.FC<MemoryCardProps> = ({ memory, currentIndex, totalCoun
             }}
         >
             {/* Handle bar */}
-            <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-3"></div>
             
-            <div className="w-full h-40 rounded-2xl overflow-hidden mb-4">
+            {/* Delete button - 오른쪽 위 */}
+            <button
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onMemoryDelete(memory.id);
+                }}
+                onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onMemoryDelete(memory.id);
+                }}
+                className="absolute top-3 right-3 w-8 h-8 bg-red-100 text-red-600 rounded-full hover:bg-red-200 active:bg-red-300 transition-colors flex items-center justify-center touch-manipulation z-10"
+            >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+            
+            <div className="w-full h-32 rounded-2xl overflow-hidden mb-3">
                 <img src={memory.imageUrl} alt={memory.title} className="w-full h-full object-cover" />
             </div>
-            <h3 className="font-bold text-lg text-gray-800">{memory.title}</h3>
-            <p className="text-gray-500">
+            <h3 className="font-bold text-base text-gray-800 mb-1">{memory.title}</h3>
+            <p className="text-sm text-gray-500 mb-3">
                 {memory.location.description || memory.location.name || memory.location.address} {memory.date}
             </p>
-            <div className="flex justify-center gap-2 mt-4">
-                {Array.from({ length: totalCount }, (_, index) => (
-                    <span 
-                        key={index}
-                        className={`block w-2.5 h-2.5 rounded-full ${
-                            index === currentIndex ? 'bg-gray-600' : 'bg-gray-300'
-                        }`}
-                    />
-                ))}
-            </div>
             
-            {/* Navigation buttons */}
-            <div className="flex justify-between items-center mt-4">
+            {/* Navigation buttons only */}
+            <div className="flex justify-center gap-4">
                 <button
                     onClick={() => currentIndex > 0 && onMemoryChange(currentIndex - 1)}
                     disabled={currentIndex === 0}
-                    className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                     이전
                 </button>
-                <span className="text-sm text-gray-500">
-                    {currentIndex + 1} / {totalCount}
-                </span>
                 <button
                     onClick={() => currentIndex < totalCount - 1 && onMemoryChange(currentIndex + 1)}
                     disabled={currentIndex === totalCount - 1}
-                    className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                     다음
-                </button>
-            </div>
-            
-            {/* Delete button */}
-            <div className="mt-4 pt-4 border-t border-gray-200">
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onMemoryDelete(memory.id);
-                    }}
-                    onTouchEnd={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onMemoryDelete(memory.id);
-                    }}
-                    className="w-full px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 active:bg-red-300 transition-colors flex items-center justify-center gap-2 touch-manipulation"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    추억 삭제
                 </button>
             </div>
         </div>
