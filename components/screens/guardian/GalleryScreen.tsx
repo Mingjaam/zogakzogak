@@ -301,7 +301,7 @@ const GalleryScreen: React.FC = () => {
                                     <input
                                         type="text"
                                         placeholder={selectedLocation ? selectedLocation.address : "위치를 선택하세요"}
-                                        value={selectedLocation ? selectedLocation.address : ""}
+                                        value={selectedLocation?.address || ""}
                                         readOnly
                                         className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700"
                                     />
