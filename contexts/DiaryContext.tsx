@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { EmotionType, EmotionScores } from '../lib/gemini';
+import api from '../lib/api-services';
+import { Diary } from '../lib/api-types';
 
 export interface DiaryEntry {
   id: string;
@@ -12,10 +14,11 @@ export interface DiaryEntry {
 
 interface DiaryContextType {
   diaries: DiaryEntry[];
-  addDiary: (diary: Omit<DiaryEntry, 'id'>) => void;
-  updateDiary: (id: string, updates: Partial<DiaryEntry>) => void;
-  deleteDiary: (id: string) => void;
-  resetDiaries: () => void;
+  addDiary: (diary: Omit<DiaryEntry, 'id'>) => Promise<void>;
+  updateDiary: (id: string, updates: Partial<DiaryEntry>) => Promise<void>;
+  deleteDiary: (id: string) => Promise<void>;
+  loadDiaries: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
@@ -32,94 +35,123 @@ interface DiaryProviderProps {
   children: ReactNode;
 }
 
-const STORAGE_KEY = 'zogakzogak_diaries';
-
-// 빈 배열로 시작 - 실제 Gemini AI 분석 결과만 사용
-const defaultDiaries: DiaryEntry[] = [];
-
-// 로컬 스토리지에서 일기 데이터 로드
-const loadDiariesFromStorage = (): DiaryEntry[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : defaultDiaries;
-    }
-  } catch (error) {
-    console.error('로컬 스토리지에서 일기 데이터를 로드하는 중 오류:', error);
-  }
-  return defaultDiaries;
+// 서버 Diary 타입을 클라이언트 DiaryEntry 타입으로 변환
+const convertServerDiaryToClient = (serverDiary: Diary): DiaryEntry => {
+  return {
+    id: serverDiary.id.toString(),
+    date: serverDiary.date,
+    content: serverDiary.content,
+    emotion: serverDiary.emotion as EmotionType,
+    emotionScores: serverDiary.emotionScores,
+    author: 'elderly' // 서버에서 role 정보를 받아서 설정해야 함
+  };
 };
 
-// 로컬 스토리지에 일기 데이터 저장
-const saveDiariesToStorage = (diaries: DiaryEntry[]) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(diaries));
-  } catch (error) {
-    console.error('로컬 스토리지에 일기 데이터를 저장하는 중 오류:', error);
-  }
+// 클라이언트 DiaryEntry 타입을 서버 Diary 타입으로 변환
+const convertClientDiaryToServer = (clientDiary: Omit<DiaryEntry, 'id'>) => {
+  return {
+    seniorId: 1, // TODO: 실제 어르신 ID 사용
+    content: clientDiary.content,
+    date: clientDiary.date,
+    sadness: clientDiary.emotionScores.sadness,
+    anger: clientDiary.emotionScores.anger,
+    fear: clientDiary.emotionScores.fear,
+    joy: clientDiary.emotionScores.joy,
+    happiness: clientDiary.emotionScores.happiness,
+    surprise: clientDiary.emotionScores.surprise
+  };
 };
 
 export const DiaryProvider: React.FC<DiaryProviderProps> = ({ children }) => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 컴포넌트 마운트 시 로컬 스토리지에서 데이터 로드
+  // 서버에서 일기 데이터 로드
+  const loadDiaries = async () => {
+    setIsLoading(true);
+    try {
+      // TODO: 실제 어르신 ID 사용
+      const serverDiaries = await api.diary.getDiaries(1);
+      const convertedDiaries = serverDiaries.map(convertServerDiaryToClient);
+      setDiaries(convertedDiaries);
+    } catch (error) {
+      console.error('일기 데이터 로드 실패:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 서버에서 데이터 로드
   useEffect(() => {
-    const loadedDiaries = loadDiariesFromStorage();
-    setDiaries(loadedDiaries);
+    loadDiaries();
   }, []);
 
-  const addDiary = (diary: Omit<DiaryEntry, 'id'>) => {
+  const addDiary = async (diary: Omit<DiaryEntry, 'id'>) => {
     console.log("📝 addDiary called with:", diary);
     
-    const newDiary: DiaryEntry = {
-      ...diary,
-      id: Date.now().toString(),
-    };
-    
-    console.log("📝 New diary created:", newDiary);
-    
-    setDiaries(prev => {
-      console.log("📝 Previous diaries count:", prev.length);
-      const updated = [newDiary, ...prev];
-      console.log("📝 Updated diaries count:", updated.length);
+    try {
+      const serverDiaryData = convertClientDiaryToServer(diary);
+      const createdDiary = await api.diary.createDiary(serverDiaryData);
       
-      try {
-        saveDiariesToStorage(updated);
-        console.log("✅ Diaries saved to storage successfully");
-      } catch (error) {
-        console.error("❌ Error saving to storage:", error);
-      }
+      // 서버에서 생성된 일기를 클라이언트 형식으로 변환
+      const newDiary = convertServerDiaryToClient(createdDiary);
       
-      return updated;
-    });
+      setDiaries(prev => [newDiary, ...prev]);
+      console.log("✅ Diary saved to server successfully");
+    } catch (error) {
+      console.error("❌ Error saving diary to server:", error);
+      throw error;
+    }
   };
 
-  const updateDiary = (id: string, updates: Partial<DiaryEntry>) => {
-    setDiaries(prev => {
-      const updated = prev.map(diary => 
-        diary.id === id ? { ...diary, ...updates } : diary
+  const updateDiary = async (id: string, updates: Partial<DiaryEntry>) => {
+    try {
+      const diaryId = parseInt(id);
+      const updateData = {
+        content: updates.content,
+        sadness: updates.emotionScores?.sadness,
+        anger: updates.emotionScores?.anger,
+        fear: updates.emotionScores?.fear,
+        joy: updates.emotionScores?.joy,
+        happiness: updates.emotionScores?.happiness,
+        surprise: updates.emotionScores?.surprise
+      };
+      
+      await api.diary.updateDiary(diaryId, updateData);
+      
+      // 로컬 상태 업데이트
+      setDiaries(prev => 
+        prev.map(diary => 
+          diary.id === id ? { ...diary, ...updates } : diary
+        )
       );
-      saveDiariesToStorage(updated);
-      return updated;
-    });
+    } catch (error) {
+      console.error("❌ Error updating diary:", error);
+      throw error;
+    }
   };
 
-  const deleteDiary = (id: string) => {
-    setDiaries(prev => {
-      const updated = prev.filter(diary => diary.id !== id);
-      saveDiariesToStorage(updated);
-      return updated;
-    });
-  };
-
-  const resetDiaries = () => {
-    setDiaries(defaultDiaries);
-    saveDiariesToStorage(defaultDiaries);
+  const deleteDiary = async (id: string) => {
+    try {
+      const diaryId = parseInt(id);
+      await api.diary.deleteDiary(diaryId);
+      
+      setDiaries(prev => prev.filter(diary => diary.id !== id));
+    } catch (error) {
+      console.error("❌ Error deleting diary:", error);
+      throw error;
+    }
   };
 
   return (
-    <DiaryContext.Provider value={{ diaries, addDiary, updateDiary, deleteDiary, resetDiaries }}>
+    <DiaryContext.Provider value={{ 
+      diaries, 
+      addDiary, 
+      updateDiary, 
+      deleteDiary, 
+      loadDiaries,
+      isLoading 
+    }}>
       {children}
     </DiaryContext.Provider>
   );
