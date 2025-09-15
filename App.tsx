@@ -7,6 +7,7 @@ import ElderlyApp from './ElderlyApp';
 import { SafeZoneProvider } from './contexts/SafeZoneContext';
 import { DiaryProvider } from './contexts/DiaryContext';
 import { MemoryProvider } from './contexts/MemoryContext';
+import { MedicationProvider } from './contexts/MedicationContext';
 
 const App: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -50,19 +51,21 @@ const App: React.FC = () => {
     // MemoryProvider를 최상위로 이동 (역할 전환 시에도 데이터 유지)
     return (
         <MemoryProvider>
-            {role === 'guardian' ? (
-                <DiaryProvider>
-                    <SafeZoneProvider>
-                        <GuardianApp onHeaderClick={handleRoleReset} />
-                    </SafeZoneProvider>
-                </DiaryProvider>
-            ) : (
-                <DiaryProvider>
-                    <SafeZoneProvider>
-                        <ElderlyApp onHeaderClick={handleRoleReset} />
-                    </SafeZoneProvider>
-                </DiaryProvider>
-            )}
+            <MedicationProvider>
+                {role === 'guardian' ? (
+                    <DiaryProvider>
+                        <SafeZoneProvider>
+                            <GuardianApp onHeaderClick={handleRoleReset} />
+                        </SafeZoneProvider>
+                    </DiaryProvider>
+                ) : (
+                    <DiaryProvider>
+                        <SafeZoneProvider>
+                            <ElderlyApp onHeaderClick={handleRoleReset} />
+                        </SafeZoneProvider>
+                    </DiaryProvider>
+                )}
+            </MedicationProvider>
         </MemoryProvider>
     );
 
