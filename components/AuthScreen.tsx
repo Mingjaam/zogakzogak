@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import api from '../lib/api-services';
 import PuzzleLogo from './icons/PuzzleLogo';
 
 interface AuthScreenProps {
@@ -11,22 +12,109 @@ interface RegisterData {
     email: string;
     password: string;
     number: string;
-    // role 제거 - 로그인 후 선택하도록 변경
+    role: 'SENIOR' | 'GUARDIAN';
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
     const [isLoginMode, setIsLoginMode] = useState(true);
+    const [loginData, setLoginData] = useState({
+        email: '',
+        password: ''
+    });
     const [registerData, setRegisterData] = useState<RegisterData>({
         name: '',
         email: '',
         password: '',
-        number: ''
+        number: '',
+        role: 'SENIOR'
     });
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleLoginClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleLoginClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        onLoginSuccess();
+        
+        if (!loginData.email || !loginData.password) {
+            alert('이메일과 비밀번호를 입력해주세요.');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            console.log('로그인 시도:', loginData);
+            
+            // 기존 토큰 제거 (문제가 있는 토큰일 수 있음)
+            localStorage.removeItem('authToken');
+            console.log('기존 토큰 제거됨');
+            
+            // 요청 데이터를 안전하게 처리
+            const safeLoginData = {
+                email: loginData.email.trim(),
+                password: loginData.password.trim()
+            };
+            
+            const result = await api.auth.login(safeLoginData);
+            console.log('로그인 응답 전체:', result);
+            console.log('로그인 응답 타입:', typeof result);
+            console.log('로그인 응답 키들:', Object.keys(result || {}));
+            console.log('로그인 응답 값:', result);
+            console.log('로그인 응답 길이:', result?.length);
+            
+            // 로그인 성공 처리
+            if (result) {
+                // 문자열인 경우 (성공 메시지)
+                if (typeof result === 'string') {
+                    if (result.includes('성공') || result.includes('완료') || result.includes('success')) {
+                        console.log('로그인 성공 메시지:', result);
+                        // 임시 토큰 생성 (실제로는 서버에서 토큰을 받아야 함)
+                        const tempToken = `temp_token_${Date.now()}`;
+                        localStorage.setItem('authToken', tempToken);
+                        console.log('임시 토큰 저장:', tempToken);
+                        onLoginSuccess();
+                    } else {
+                        // 토큰으로 사용
+                        localStorage.setItem('authToken', result);
+                        console.log('토큰 저장:', result);
+                        onLoginSuccess();
+                    }
+                } else if (result.data) {
+                    localStorage.setItem('authToken', result.data);
+                    console.log('토큰 저장:', result.data);
+                    onLoginSuccess();
+                } else if (result.token) {
+                    localStorage.setItem('authToken', result.token);
+                    console.log('토큰 저장:', result.token);
+                    onLoginSuccess();
+                } else if (result.accessToken) {
+                    localStorage.setItem('authToken', result.accessToken);
+                    console.log('토큰 저장:', result.accessToken);
+                    onLoginSuccess();
+                } else {
+                    console.error('예상치 못한 응답 형식:', result);
+                    alert('로그인 응답 형식을 인식할 수 없습니다.');
+                }
+            } else {
+                console.error('로그인 응답이 비어있습니다:', result);
+                alert('로그인 응답이 비어있습니다.');
+            }
+        } catch (error) {
+            console.error('로그인 실패:', error);
+            console.error('로그인 실패 상세:', {
+                message: error.message,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data
+            });
+            
+            if (error.response?.status === 403) {
+                alert('로그인이 거부되었습니다. 이메일과 비밀번호를 확인해주세요.');
+            } else if (error.response?.status === 401) {
+                alert('인증에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+            } else {
+                alert(`로그인에 실패했습니다: ${error.message}`);
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleRegisterClick = () => {
@@ -41,7 +129,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
             name: '',
             email: '',
             password: '',
-            number: ''
+            number: '',
+            role: 'SENIOR'
         });
     };
 
@@ -50,25 +139,15 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://52.79.251.209:8080/api/users/register', {
-                method: 'POST',
-                headers: {
-                    'accept': '*/*',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(registerData)
-            });
-
-            if (response.ok) {
-                alert('회원가입이 완료되었습니다!');
-                handleBackToLogin();
-            } else {
-                const errorData = await response.json();
-                alert(`회원가입 실패: ${errorData.message || '알 수 없는 오류가 발생했습니다.'}`);
-            }
+            console.log('회원가입 시도:', registerData);
+            const result = await api.auth.register(registerData);
+            console.log('회원가입 성공:', result);
+            
+            alert('회원가입이 완료되었습니다!');
+            handleBackToLogin();
         } catch (error) {
             console.error('회원가입 오류:', error);
-            alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+            alert('회원가입에 실패했습니다. 다시 시도해주세요.');
         } finally {
             setIsLoading(false);
         }
@@ -76,6 +155,13 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
 
     const handleInputChange = (field: keyof RegisterData, value: string) => {
         setRegisterData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleLoginInputChange = (field: keyof typeof loginData, value: string) => {
+        setLoginData(prev => ({
             ...prev,
             [field]: value
         }));
@@ -112,8 +198,10 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                             <form className="space-y-5">
                                 <div>
                                     <input
-                                        type="text"
-                                        placeholder="아이디"
+                                        type="email"
+                                        placeholder="이메일"
+                                        value={loginData.email}
+                                        onChange={(e) => handleLoginInputChange('email', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                     />
                                 </div>
@@ -121,6 +209,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                     <input
                                         type="password"
                                         placeholder="비밀번호"
+                                        value={loginData.password}
+                                        onChange={(e) => handleLoginInputChange('password', e.target.value)}
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                     />
                                 </div>
@@ -128,9 +218,10 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                     <button
                                         type="button"
                                         onClick={handleLoginClick}
-                                        className="w-full py-4 text-lg font-bold text-white bg-[#70c18c] rounded-full hover:bg-[#5da576] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#70c18c] transition-all duration-300 transform hover:scale-105"
+                                        disabled={isLoading}
+                                        className="w-full py-4 text-lg font-bold text-white bg-[#70c18c] rounded-full hover:bg-[#5da576] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#70c18c] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                     >
-                                        로그인
+                                        {isLoading ? '로그인 중...' : '로그인'}
                                     </button>
                                 </div>
                             </form>
@@ -189,6 +280,33 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLoginSuccess }) => {
                                         className="w-full px-5 py-4 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#70c18c] transition-shadow"
                                         required
                                     />
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-700 mb-2">역할 선택</div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleInputChange('role', 'SENIOR')}
+                                            className={`flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all duration-300 ${
+                                                registerData.role === 'SENIOR'
+                                                    ? 'bg-[#70c18c] text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            어르신
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleInputChange('role', 'GUARDIAN')}
+                                            className={`flex-1 py-3 px-4 rounded-full text-sm font-medium transition-all duration-300 ${
+                                                registerData.role === 'GUARDIAN'
+                                                    ? 'bg-[#70c18c] text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            보호자
+                                        </button>
+                                    </div>
                                 </div>
                                 
 
