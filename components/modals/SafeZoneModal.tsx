@@ -20,10 +20,11 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
   currentCenter = { lat: 35.8714, lng: 128.6014 },
   currentRadius = 500
 }) => {
-  const { safeZone, updateSafeZone } = useSafeZone();
-  const [center, setCenter] = useState(safeZone.center);
-  const [radius, setRadius] = useState(safeZone.radius);
+  const { safeZone, updateSafeZone, isLoading } = useSafeZone();
+  const [center, setCenter] = useState(safeZone.center || { lat: 35.8714, lng: 128.6014 });
+  const [radius, setRadius] = useState(safeZone.radius || 500);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
   const circleRef = useRef<google.maps.Circle | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
@@ -106,11 +107,19 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
     }
   };
 
-  const handleSave = () => {
-    updateSafeZone(center, radius);
-    onSave(center, radius);
-    document.body.style.overflow = '';
-    onClose();
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateSafeZone(center, radius);
+      onSave(center, radius);
+      document.body.style.overflow = '';
+      onClose();
+    } catch (error) {
+      console.error('안전구역 저장 실패:', error);
+      alert('안전구역 저장에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
@@ -249,7 +258,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
                     </label>
                     <input
                       type="number"
-                      value={center.lat.toFixed(6)}
+                      value={center.lat?.toFixed(6) || '0.000000'}
                       onChange={(e) => setCenter({ ...center, lat: Number(e.target.value) })}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#70c18c] focus:border-transparent"
                       step="0.000001"
@@ -261,7 +270,7 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
                     </label>
                     <input
                       type="number"
-                      value={center.lng.toFixed(6)}
+                      value={center.lng?.toFixed(6) || '0.000000'}
                       onChange={(e) => setCenter({ ...center, lng: Number(e.target.value) })}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#70c18c] focus:border-transparent"
                       step="0.000001"
@@ -334,9 +343,10 @@ const SafeZoneModal: React.FC<SafeZoneModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-3 text-white bg-[#70c18c] rounded-full hover:bg-[#5aa373] active:bg-[#4a8a5f] transition touch-manipulation min-h-[44px]"
+            disabled={isSaving}
+            className="px-6 py-3 text-white bg-[#70c18c] rounded-full hover:bg-[#5aa373] active:bg-[#4a8a5f] transition touch-manipulation min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            저장
+            {isSaving ? '저장 중...' : '저장'}
           </button>
         </div>
       </div>
