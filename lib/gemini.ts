@@ -1,13 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-
-export interface Person {
-    id: string;
-    name: string;
-    relationship: string;
-    photo: string; // base64 encoded image
-}
-
-export type EmotionType = 'joy' | 'happiness' | 'surprise' | 'sadness' | 'anger' | 'fear';
+import { Person, EmotionType, EmotionScores } from './api-types';
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY });
 
@@ -101,14 +93,7 @@ export const detectFace = async (targetImageBase64: string): Promise<boolean> =>
     }
 };
 
-export interface EmotionScores {
-    joy: number;
-    happiness: number;
-    surprise: number;
-    sadness: number;
-    anger: number;
-    fear: number;
-}
+// EmotionScores는 api-types.ts에서 import
 
 export const analyzeEmotion = async (diaryText: string): Promise<EmotionType> => {
     const model = 'gemini-2.5-flash';
