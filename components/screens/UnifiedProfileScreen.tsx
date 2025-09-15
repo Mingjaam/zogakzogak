@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useProfile } from '../../contexts/ProfileContext';
 
 interface UnifiedProfileScreenProps {
     currentRole: 'guardian' | 'elderly';
@@ -9,6 +10,13 @@ const UnifiedProfileScreen: React.FC<UnifiedProfileScreenProps> = ({ currentRole
     const [locationNotification, setLocationNotification] = useState(false);
     const [medicationNotification, setMedicationNotification] = useState(true);
     const [memoryNotification, setMemoryNotification] = useState(true);
+    
+    // 프로필 컨텍스트 사용
+    const { guardianProfile, elderlyProfile, updateGuardianProfile, updateElderlyProfile, isLoading } = useProfile();
+    
+    // 편집 모드 상태
+    const [editingName, setEditingName] = useState<string | null>(null);
+    const [tempName, setTempName] = useState('');
 
     const handleLogout = () => {
         if (window.confirm('정말 로그아웃 하시겠습니까?')) {
@@ -17,11 +25,50 @@ const UnifiedProfileScreen: React.FC<UnifiedProfileScreenProps> = ({ currentRole
         }
     };
 
+    // 이름 편집 시작
+    const handleEditName = (memberId: string, currentName: string) => {
+        setEditingName(memberId);
+        setTempName(currentName);
+    };
+
+    // 이름 편집 취소
+    const handleCancelEdit = () => {
+        setEditingName(null);
+        setTempName('');
+    };
+
+    // 이름 저장
+    const handleSaveName = async (memberId: string) => {
+        if (tempName.trim()) {
+            try {
+                if (memberId === 'guardian') {
+                    await updateGuardianProfile({ name: tempName.trim() });
+                } else if (memberId === 'elderly') {
+                    await updateElderlyProfile({ name: tempName.trim() });
+                }
+                setEditingName(null);
+                setTempName('');
+            } catch (error) {
+                console.error('이름 저장 실패:', error);
+                alert('이름 저장에 실패했습니다.');
+            }
+        }
+    };
+
+    // 키보드 이벤트 처리
+    const handleKeyPress = (e: React.KeyboardEvent, memberId: string) => {
+        if (e.key === 'Enter') {
+            handleSaveName(memberId);
+        } else if (e.key === 'Escape') {
+            handleCancelEdit();
+        }
+    };
+
     // 가족 정보 데이터
     const familyMembers = [
         {
             id: 'guardian',
-            name: '김영서',
+            name: guardianName,
             email: 'Zeroowe01@naver.com',
             role: '보호자',
             roleColor: 'text-green-600',
@@ -31,7 +78,7 @@ const UnifiedProfileScreen: React.FC<UnifiedProfileScreenProps> = ({ currentRole
         },
         {
             id: 'elderly',
-            name: '박길수',
+            name: elderlyName,
             email: 'grandpa@family.com',
             role: '어르신',
             roleColor: 'text-blue-600',
@@ -90,7 +137,48 @@ const UnifiedProfileScreen: React.FC<UnifiedProfileScreenProps> = ({ currentRole
                                 {/* 정보 */}
                                 <div className="flex-grow">
                                     <div className="flex items-center gap-2">
-                                        <h4 className="text-lg font-bold text-gray-800">{member.name}</h4>
+                                        {editingName === member.id ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={tempName}
+                                                    onChange={(e) => setTempName(e.target.value)}
+                                                    className="text-lg font-bold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#70c18c]"
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleSaveName(member.id)}
+                                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                                    title="저장"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={handleCancelEdit}
+                                                    className="p-1 text-red-600 hover:bg-red-50 rounded"
+                                                    title="취소"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="text-lg font-bold text-gray-800">{member.name}</h4>
+                                                <button
+                                                    onClick={() => handleEditName(member.id, member.name)}
+                                                    className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                                                    title="이름 수정"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        )}
                                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${member.roleBg} ${member.roleColor}`}>
                                             {member.role}
                                         </span>
